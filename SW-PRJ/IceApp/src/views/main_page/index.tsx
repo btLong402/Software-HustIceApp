@@ -84,20 +84,20 @@ const DataSection = () => {
   );
 };
 
-function MainScreen() {
+function MainScreen({navigation}) {
   return (
     <SafeAreaView>
       <ScrollView style={styles.background}>
         <View style={styles.container}>
-          <TouchableOpacity style={styles.cart}>
-            <Image source={require('../../components/images/cart.png')} />
+          <TouchableOpacity style={styles.cart} onPress={() => navigation.navigate('Cart')}>
+            <Image source={require('../../assets/images/cart.png')} />
           </TouchableOpacity>
           <View style={styles.header}>
             <Text style={styles.h1}>Menu</Text>
             <Text style={styles.h2}>Homemade meals prepared with love.</Text>
             <Text style={styles.h2}>Richest ingredients.</Text>
             <View style={styles.search}>
-              <Image source={require('../../components/images/loop.png')} />
+              <Image source={require('../../assets/images/loop.png')} />
               <TextInput
                 style={styles.search_input}
                 placeholder="Search Menu"
