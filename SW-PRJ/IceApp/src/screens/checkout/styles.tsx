@@ -22,6 +22,9 @@ export default styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
   },
+  jusitfyBetween: {
+    justifyContent: 'space-between',
+  },
   button: {
     backgroundColor: 'crimson',
     width: '90%',

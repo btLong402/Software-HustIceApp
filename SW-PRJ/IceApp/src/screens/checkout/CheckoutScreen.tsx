@@ -4,7 +4,8 @@ import {
   SafeAreaView,
   TouchableOpacity,
   StyleSheet,
-  Touchable,
+  Image,
+  TextInput,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -12,41 +13,49 @@ import styles from './styles';
 import Spacer from '../../components/Spacer';
 import Seperator from '../../components/Seperator';
 import {ScrollView} from 'react-native-gesture-handler';
-import {Button} from 'react-native-elements';
+import {Button, Input} from 'react-native-elements';
+import MasterCardIcon from '../../assets/images/Mastercard_2019_logo.svg';
 
 const Circle = ({
   backgroundColor,
   borderWidth = 0,
   text = '',
-  textColor,
+  textColor = 'black',
+  opacity = 1,
   onClick = () => {},
 }) => {
   return (
-    <TouchableOpacity
-      onPress={onClick}
+    <View
       style={{
-        height: 20,
-        width: 20,
+        backgroundColor: '#f6f6f6',
         borderRadius: 50,
-        backgroundColor: backgroundColor,
-        borderWidth: borderWidth,
-        alignItems: 'center',
-        justifyContent: 'center',
       }}>
-      <Text
+      <TouchableOpacity
+        onPress={onClick}
         style={{
-          fontSize: 14,
-          fontWeight: 'bold',
-          color: textColor,
+          height: 20,
+          width: 20,
+          borderRadius: 50,
+          backgroundColor: backgroundColor,
+          borderWidth: borderWidth,
+          alignItems: 'center',
+          justifyContent: 'center',
+          opacity: opacity,
         }}>
-        {text}
-      </Text>
-    </TouchableOpacity>
+        <Text
+          style={{
+            fontSize: 14,
+            fontWeight: 'bold',
+            color: textColor,
+          }}>
+          {text}
+        </Text>
+      </TouchableOpacity>
+    </View>
   );
 };
 
 const ProcessLine = ({screenIndex}) => {
-  console.log(screenIndex);
   let percentage;
   if (screenIndex == 0) {
     percentage = 0;
@@ -59,7 +68,10 @@ const ProcessLine = ({screenIndex}) => {
     <View
       style={{
         height: 8,
-        width: '90%',
+        width: '100%',
+        position: 'absolute',
+        top: 6,
+        elevation: 4,
       }}>
       {/* <Circle backgroundColor={'crimson'} isAbsolute={true} /> */}
       <View
@@ -86,10 +98,57 @@ const ProcessLine = ({screenIndex}) => {
   );
 };
 
-const ProcessSegment = ({screenIndex}) => {
+const ProcessSegment = ({screenIndex, onClick}) => {
+  const handleProcessCirleClick = index => {
+    if (index < screenIndex) {
+      onClick(index);
+    }
+  };
+  const processArray = ['Shipping', 'Payment', 'Submit'];
+  const processCircles = processArray.map((label, index) => {
+    if (index < screenIndex) {
+      return (
+        <Circle
+          backgroundColor={'crimson'}
+          text={'✓'}
+          textColor={'white'}
+          key={index}
+          onClick={() => handleProcessCirleClick(index)}
+        />
+      );
+    } else if (index === screenIndex) {
+      return (
+        <Circle
+          backgroundColor={'crimson'}
+          key={index}
+          onClick={() => handleProcessCirleClick(index)}
+        />
+      );
+    } else {
+      return (
+        <Circle
+          backgroundColor={'crimson'}
+          opacity={0.2}
+          key={index}
+          onClick={() => handleProcessCirleClick(index)}
+        />
+      );
+    }
+  });
   return (
-    <View style={localStyles.processContainer}>
-      <ProcessLine screenIndex={screenIndex} />
+    <View>
+      <View style={localStyles.processContainer}>
+        <ProcessLine screenIndex={screenIndex} />
+        {processCircles}
+      </View>
+      <Spacer height={5} />
+      <View style={localStyles.processContainer}>
+        {processArray.map((label, index) => {
+          if (index <= screenIndex) {
+            return <Text style={{opacity: 0.9}}>{label}</Text>;
+          } else return <Text style={{opacity: 0.3}}>{label}</Text>;
+        })}
+      </View>
     </View>
   );
 };
@@ -158,13 +217,13 @@ const ShippingSegment = () => {
                           backgroundColor={'crimson'}
                           text="✓"
                           textColor={'white'}
-                          onClick={() => handleClick(index)}
+                          onClick={handleClick.bind(null, index)}
                         />
                       ) : (
                         <Circle
                           backgroundColor={'white'}
                           borderWidth={1}
-                          onClick={() => handleClick(index)}
+                          onClick={handleClick.bind(null, index)}
                         />
                       )}
                     </TouchableOpacity>
@@ -227,10 +286,66 @@ const ShippingSegment = () => {
   );
 };
 
+const PaymentCard = () => {
+  return (
+    <View style={localStyles.card}>
+      <Image source={require('../../assets/images/Google.png')} />
+    </View>
+  );
+};
+
+const PaymentInputTitle = ({title}) => {
+  return (
+    <Text
+      style={{
+        fontSize: 16,
+        fontWeight: '500',
+      }}>
+      {title}
+    </Text>
+  );
+};
+
+const PaymentInput = ({title}) => {
+  return (
+    <View>
+      <Spacer height={10} />
+      <PaymentInputTitle title={title} />
+      <Spacer height={5} />
+      <TextInput
+        placeholder="Card Number"
+        // leftIcon={<Ionicons name="card-outline" size={24} color="black" />}
+        style={{
+          fontSize: 16,
+          paddingVertical: 15,
+          paddingHorizontal: 20,
+          backgroundColor: '#f6f6f6',
+        }}
+      />
+      <Spacer height={5} />
+    </View>
+  );
+};
 const PaymentSegment = () => {
   return (
     <View style={mainContainer}>
-      <Text>PaymentScreen</Text>
+      <Text style={localStyles.header}>Add Payment Method</Text>
+      <Spacer height={30} />
+      <View style={StyleSheet.compose(styles.row, styles.jusitfyBetween)}>
+        {Array(3)
+          .fill(0)
+          .map((_, index) => {
+            return <PaymentCard key={index} />;
+          })}
+      </View>
+      <Spacer height={20} />
+      <PaymentInput title="Card Number" />
+      {/* <Spacer height={20} /> */}
+      <View style={StyleSheet.compose(styles.row, styles.jusitfyBetween)}>
+        <PaymentInput title="CVV/CVC" />
+        <PaymentInput title="Expiration Date" />
+      </View>
+      <PaymentInput title="Card Holder Name" />
     </View>
   );
 };
@@ -244,6 +359,9 @@ const SubmitSegment = () => {
 };
 const CheckoutScreen = ({navigation}) => {
   const [screenIndex, setScreenIndex] = useState(0);
+  const handleClickChangeScreen = screenIndex => {
+    setScreenIndex(screenIndex);
+  };
 
   useEffect(() => {
     const headerLeft = () => (
@@ -277,7 +395,10 @@ const CheckoutScreen = ({navigation}) => {
       <SafeAreaView style={{flex: 1}}>
         {/* <Circle /> */}
         {/* <ProcessLine /> */}
-        <ProcessSegment screenIndex={screenIndex} />
+        <ProcessSegment
+          screenIndex={screenIndex}
+          onClick={handleClickChangeScreen}
+        />
         <Spacer height={30} />
         {screenIndex === 0 ? (
           <ShippingSegment />
@@ -325,7 +446,26 @@ const localStyles = StyleSheet.create({
     width: '90%',
   },
   processContainer: {
+    width: '90%',
+    alignSelf: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  card: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'white',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#999999',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 1},
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    marginHorizontal: 5,
+    paddingVertical: 5,
   },
 });
 export default CheckoutScreen;
