@@ -1,6 +1,13 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react';
+import {useAppDispatch, useAppSelector} from '../../redux/hooks';
+import {
+  increment,
+  decrement,
+  selectCount,
+} from '../../redux/counter/couterSlice';
+
 import {
   Image,
   Pressable,
@@ -85,11 +92,16 @@ const DataSection = () => {
 };
 
 function MainScreen({navigation}) {
+  const count = useAppSelector(selectCount);
+  const dispatch = useAppDispatch();
+  
   return (
     <SafeAreaView>
       <ScrollView style={styles.background}>
         <View style={styles.container}>
-          <TouchableOpacity style={styles.cart} onPress={() => navigation.navigate('Cart')}>
+          <TouchableOpacity
+            style={styles.cart}
+            onPress={() => navigation.navigate('Cart')}>
             <Image source={require('../../assets/images/cart.png')} />
           </TouchableOpacity>
           <View style={styles.header}>
@@ -107,6 +119,7 @@ function MainScreen({navigation}) {
           <View style={styles.body}>
             <DataSection />
           </View>
+          <View></View>
         </View>
       </ScrollView>
     </SafeAreaView>
