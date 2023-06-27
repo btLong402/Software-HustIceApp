@@ -11,7 +11,7 @@ export default styles = StyleSheet.create({
     flexDirection: 'column',
     backgroundColor: 'white',
     paddingHorizontal: 15,
-    paddingVertical: 20,
+    paddingVertical: 10,
     borderRadius: 10,
     elevation: 4,
     shadowColor: '#000',

@@ -3,12 +3,13 @@ import {StyleSheet, StatusBar} from 'react-native';
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'crimson',
+    backgroundColor: '#ececec',
     paddingTop: StatusBar.currentHeight,
   },
   avatarContainer: {
     alignItems: 'center',
     flex: 1,
+    backgroundColor: 'crimson',
   },
   avatar: {
     width: 100,
@@ -24,10 +25,10 @@ export const styles = StyleSheet.create({
     position: 'absolute',
   },
   infoContainer: {
-    marginTop: 40,
+    // marginTop: 40,
     backgroundColor: 'white',
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
+    // borderTopLeftRadius: 30,
+    // borderTopRightRadius: 30,
     flex: 3,
     paddingVertical: 30,
     paddingHorizontal: 15,

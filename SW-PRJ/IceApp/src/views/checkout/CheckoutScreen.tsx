@@ -6,16 +6,14 @@ import {
   StyleSheet,
   Image,
   TextInput,
+  ScrollView,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import styles from './styles';
 import Spacer from '../../components/Spacer';
 import Seperator from '../../components/Seperator';
-import {ScrollView} from 'react-native-gesture-handler';
-import {Button, Input} from 'react-native-elements';
 import MasterCardIcon from '../../assets/images/Mastercard_2019_logo.svg';
-
 const Circle = ({
   backgroundColor,
   borderWidth = 0,
@@ -250,7 +248,7 @@ const ShippingSegment = () => {
           alignItems: 'center',
         }}>
         {shippingCircles}
-        <Spacer height={30} />
+        <Spacer height={20} />
         <TouchableOpacity
           style={{
             flex: 1,
@@ -260,6 +258,7 @@ const ShippingSegment = () => {
             borderColor: 'crimson',
             borderWidth: 2,
             borderRadius: 20,
+            paddingVertical: 10,
             width: '80%',
             opacity: 0.9,
             borderStyle: 'dashed',
@@ -330,7 +329,7 @@ const PaymentSegment = () => {
   return (
     <View style={mainContainer}>
       <Text style={localStyles.header}>Add Payment Method</Text>
-      <Spacer height={30} />
+      <Spacer height={10} />
       <View style={StyleSheet.compose(styles.row, styles.jusitfyBetween)}>
         {Array(3)
           .fill(0)
@@ -339,13 +338,15 @@ const PaymentSegment = () => {
           })}
       </View>
       <Spacer height={20} />
-      <PaymentInput title="Card Number" />
-      {/* <Spacer height={20} /> */}
-      <View style={StyleSheet.compose(styles.row, styles.jusitfyBetween)}>
-        <PaymentInput title="CVV/CVC" />
-        <PaymentInput title="Expiration Date" />
-      </View>
-      <PaymentInput title="Card Holder Name" />
+      <ScrollView>
+        <PaymentInput title="Card Number" />
+        {/* <Spacer height={20} /> */}
+        <View style={StyleSheet.compose(styles.row, styles.jusitfyBetween)}>
+          <PaymentInput title="CVV/CVC" />
+          <PaymentInput title="Expiration Date" />
+        </View>
+        <PaymentInput title="Card Holder Name" />
+      </ScrollView>
     </View>
   );
 };
@@ -430,6 +431,7 @@ const addressRow = StyleSheet.compose(styles.row, {
 
 const mainContainer = StyleSheet.compose(styles.childContainer, {
   flex: 1,
+  minHeight: 200,
 });
 const localStyles = StyleSheet.create({
   mainContainer: {

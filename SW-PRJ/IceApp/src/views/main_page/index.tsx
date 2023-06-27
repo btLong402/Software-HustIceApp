@@ -1,12 +1,6 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react';
-import {useAppDispatch, useAppSelector} from '../../redux/hooks';
-import {
-  increment,
-  decrement,
-  selectCount,
-} from '../../redux/counter/couterSlice';
 
 import {
   Image,
@@ -92,9 +86,6 @@ const DataSection = () => {
 };
 
 function MainScreen({navigation}) {
-  const count = useAppSelector(selectCount);
-  const dispatch = useAppDispatch();
-  
   return (
     <SafeAreaView>
       <ScrollView style={styles.background}>

@@ -2,26 +2,12 @@ import React, {useEffect, useState} from 'react';
 import {View, Text, StyleSheet, TextInput} from 'react-native';
 import {RouteProp} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
-import {RootStackParamList} from './types'; // import your stack param list types
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useLayoutEffect} from 'react';
-
-type EditProfileScreenRouteProp = RouteProp<RootStackParamList, 'EditProfile'>;
-type ProfileScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  'Profile'
->;
-
-type EditProfileScreenProps = {
-  route: EditProfileScreenRouteProp;
-  navigation: ProfileScreenNavigationProp;
-};
-
-const EditProfileScreen: React.FC<EditProfileScreenProps> = ({
-  route,
-  navigation,
-}) => {
+import {Radio, Flex} from 'native-base';
+import {convertGender} from './ProfileScreen';
+const EditProfileScreen = ({route, navigation}) => {
   const {label, value} = route.params;
 
   const [isCanSaved, setIsCanSaved] = useState(false);
@@ -54,6 +40,13 @@ const EditProfileScreen: React.FC<EditProfileScreenProps> = ({
         />
       );
       break;
+    case 'Gender':
+      editScreen = (
+        <GenderEditScreen
+          value={value}
+          onChangeSavedDisplay={handleSavedDisplay}
+        />
+      );
     default:
   }
   useLayoutEffect(() => {
@@ -130,6 +123,45 @@ const FullnameEditScreen = ({value, onChangeSavedDisplay}) => {
   );
 };
 
+const GenderEditScreen = ({value, onChangeSavedDisplay}) => {
+  const [gender, setGender] = useState(value);
+  const handleGenderChange = text => {
+    setGender(text);
+  };
+  useLayoutEffect(() => {
+    if (gender === value) {
+      onChangeSavedDisplay(false);
+    } else {
+      onChangeSavedDisplay(true);
+    }
+  }, [gender]);
+
+  return (
+    <View>
+      <Radio.Group
+        name="myRadioGroup"
+        accessibilityLabel="favorite number"
+        value={gender}
+        onChange={nextValue => {
+          setGender(nextValue);
+        }}>
+        {[0, 1, 2].map(item => {
+          return (
+            <Flex
+              width={'full'}
+              direction="row"
+              justifyContent={'space-between'}
+              alignItems={'center'}
+              style={styles.input}>
+              <Text style={styles.text}>{convertGender(item)}</Text>
+              <Radio value={item} my={1} isPressed={item === value} />
+            </Flex>
+          );
+        })}
+      </Radio.Group>
+    </View>
+  );
+};
 const EmailEditScreen = ({value, onChangeSavedDisplay}) => {
   const [email, setEmail] = useState(value);
   const handleEmailChange = text => {
@@ -206,6 +238,11 @@ const styles = StyleSheet.create({
     shadowOffset: {width: 0, height: 1},
     shadowOpacity: 0.2,
     shadowRadius: 2,
+    marginBottom: 10,
+  },
+  text: {
+    fontSize: 18,
+    fontWeight: '400',
   },
 });
 

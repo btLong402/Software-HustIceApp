@@ -4,11 +4,10 @@ import {
   SafeAreaView,
   StyleSheet,
   TouchableOpacity,
+  ScrollView,
 } from 'react-native';
 import React, {useEffect} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {Image} from 'react-native-elements';
-import {ScrollView} from 'react-native-gesture-handler';
 import Spacer from '../../components/Spacer';
 import Seperator from '../../components/Seperator';
 import styles from './styles';
@@ -56,11 +55,9 @@ const ProdSegment = () => {
             return (
               <View key={index}>
                 <View style={styles.row}>
-                  <Image
+                  <img
                     style={localStyles.prodImage}
-                    source={{
-                      uri: 'https://tea-3.lozi.vn/v1/ship/resized/test-huongg-lam-dong-1637048248725161849-supper-sundae-dau-tay-0-1680061286?w=640&type=o',
-                    }}
+                    src="https://tea-3.lozi.vn/v1/ship/resized/test-huongg-lam-dong-1637048248725161849-supper-sundae-dau-tay-0-1680061286?w=640&type=o"
                   />
                   <View style={localStyles.prodInfo}>
                     <Text
@@ -179,7 +176,7 @@ const priceRow = StyleSheet.compose(styles.row, {
   justifyContent: 'space-between',
 });
 const priceContainer = StyleSheet.compose(styles.childContainer, {
-  flex: 1,
+  flexShrink: 0,
 });
 
 const foodContainer = StyleSheet.compose(styles.childContainer, {
