@@ -5,9 +5,13 @@ import {StackNavigationProp} from '@react-navigation/stack';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useLayoutEffect} from 'react';
-import {Radio, Flex} from 'native-base';
+import {Radio, Flex, Box} from 'native-base';
 import {convertGender} from './ProfileScreen';
+import {TouchableNativeFeedback, TouchableHighlight} from 'react-native';
+import {useUser} from '../../context/userContext';
+
 const EditProfileScreen = ({route, navigation}) => {
+  const {dispatch, USER_REDUCER_TYPE} = useUser();
   const {label, value} = route.params;
 
   const [isCanSaved, setIsCanSaved] = useState(false);
@@ -21,6 +25,12 @@ const EditProfileScreen = ({route, navigation}) => {
         <FullnameEditScreen
           value={value}
           onChangeSavedDisplay={handleSavedDisplay}
+          onChangeFullname={text => {
+            dispatch({
+              type: USER_REDUCER_TYPE.UPDATE_FULLNAME,
+              payload: text,
+            });
+          }}
         />
       );
       break;
@@ -29,6 +39,12 @@ const EditProfileScreen = ({route, navigation}) => {
         <EmailEditScreen
           value={value}
           onChangeSavedDisplay={handleSavedDisplay}
+          onChangeEmail={text => {
+            dispatch({
+              type: USER_REDUCER_TYPE.UPDATE_EMAIL,
+              payload: text,
+            });
+          }}
         />
       );
       break;
@@ -37,6 +53,12 @@ const EditProfileScreen = ({route, navigation}) => {
         <PhoneEditScreen
           value={value}
           onChangeSavedDisplay={handleSavedDisplay}
+          onChangePhone={text => {
+            dispatch({
+              type: USER_REDUCER_TYPE.UPDATE_PHONE,
+              payload: text,
+            });
+          }}
         />
       );
       break;
@@ -45,6 +67,12 @@ const EditProfileScreen = ({route, navigation}) => {
         <GenderEditScreen
           value={value}
           onChangeSavedDisplay={handleSavedDisplay}
+          onChangeGender={selection => {
+            dispatch({
+              type: USER_REDUCER_TYPE.UPDATE_GENDER,
+              payload: selection,
+            });
+          }}
         />
       );
     default:
@@ -54,7 +82,7 @@ const EditProfileScreen = ({route, navigation}) => {
       <Ionicons
         name="arrow-back"
         size={30}
-        color="white"
+        color="crimson"
         style={{marginLeft: 10}}
         onPress={() => {
           navigation.goBack();
@@ -64,9 +92,9 @@ const EditProfileScreen = ({route, navigation}) => {
     navigation.setOptions({
       title: 'Edit ' + label,
       headerLeft: headerLeft,
-      headerTintColor: 'white',
+      headerTintColor: 'black',
       headerStyle: {
-        backgroundColor: 'crimson',
+        backgroundColor: 'white',
       },
       headerTitleStyle: {
         fontSize: 20, // set the font size of the header title to 20
@@ -77,7 +105,7 @@ const EditProfileScreen = ({route, navigation}) => {
         <Ionicons
           name="checkmark"
           size={30}
-          color="white"
+          color="crimson"
           style={{marginRight: 10, opacity: isCanSaved ? 1 : 0.5}}
           onPress={() => {
             isCanSaved && navigation.goBack();
@@ -94,7 +122,11 @@ const EditProfileScreen = ({route, navigation}) => {
   );
 };
 
-const FullnameEditScreen = ({value, onChangeSavedDisplay}) => {
+const FullnameEditScreen = ({
+  value,
+  onChangeSavedDisplay,
+  onChangeFullname,
+}) => {
   const [fullname, setFullname] = useState(value);
   const handleFullnameChange = text => {
     setFullname(text);
@@ -104,6 +136,7 @@ const FullnameEditScreen = ({value, onChangeSavedDisplay}) => {
       onChangeSavedDisplay(false);
     } else {
       onChangeSavedDisplay(true);
+      onChangeFullname(fullname);
     }
   }, [fullname]);
 
@@ -123,30 +156,30 @@ const FullnameEditScreen = ({value, onChangeSavedDisplay}) => {
   );
 };
 
-const GenderEditScreen = ({value, onChangeSavedDisplay}) => {
+const GenderEditScreen = ({value, onChangeSavedDisplay, onChangeGender}) => {
   const [gender, setGender] = useState(value);
-  const handleGenderChange = text => {
-    setGender(text);
-  };
+  console.log('gender: ', gender);
   useLayoutEffect(() => {
     if (gender === value) {
       onChangeSavedDisplay(false);
     } else {
       onChangeSavedDisplay(true);
+      onChangeGender(gender);
     }
   }, [gender]);
 
   return (
-    <View>
-      <Radio.Group
-        name="myRadioGroup"
-        accessibilityLabel="favorite number"
-        value={gender}
-        onChange={nextValue => {
-          setGender(nextValue);
-        }}>
-        {[0, 1, 2].map(item => {
-          return (
+    <Radio.Group
+      name="myRadioGroup"
+      accessibilityLabel="favorite number"
+      aria-label="gender selection"
+      value={gender}
+      onChange={nextValue => {
+        setGender(nextValue);
+      }}>
+      {[0, 1, 2].map(item => {
+        return (
+          <TouchableNativeFeedback key={item} onPress={() => setGender(item)}>
             <Flex
               width={'full'}
               direction="row"
@@ -154,15 +187,15 @@ const GenderEditScreen = ({value, onChangeSavedDisplay}) => {
               alignItems={'center'}
               style={styles.input}>
               <Text style={styles.text}>{convertGender(item)}</Text>
-              <Radio value={item} my={1} isPressed={item === value} />
+              <Radio aria-label={`${item}`} value={item} my={1} />
             </Flex>
-          );
-        })}
-      </Radio.Group>
-    </View>
+          </TouchableNativeFeedback>
+        );
+      })}
+    </Radio.Group>
   );
 };
-const EmailEditScreen = ({value, onChangeSavedDisplay}) => {
+const EmailEditScreen = ({value, onChangeSavedDisplay, onChangeEmail}) => {
   const [email, setEmail] = useState(value);
   const handleEmailChange = text => {
     setEmail(text);
@@ -173,6 +206,7 @@ const EmailEditScreen = ({value, onChangeSavedDisplay}) => {
       onChangeSavedDisplay(false);
     } else {
       onChangeSavedDisplay(true);
+      onChangeEmail(email);
     }
   }, [email]);
 
@@ -191,7 +225,7 @@ const EmailEditScreen = ({value, onChangeSavedDisplay}) => {
   );
 };
 
-const PhoneEditScreen = ({value, onChangeSavedDisplay}) => {
+const PhoneEditScreen = ({value, onChangeSavedDisplay, onChangePhone}) => {
   const [phone, setPhone] = useState(value);
   const handlePhoneChange = text => {
     setPhone(text);
@@ -202,6 +236,7 @@ const PhoneEditScreen = ({value, onChangeSavedDisplay}) => {
       onChangeSavedDisplay(false);
     } else {
       onChangeSavedDisplay(true);
+      onChangePhone(phone);
     }
   }, [phone]);
 

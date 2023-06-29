@@ -15,6 +15,7 @@ import {
 } from 'native-base';
 import type {StorageManager} from 'native-base';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {UserProvider} from './src/context/userContext';
 
 const theme = {
   colors: {
@@ -66,7 +67,9 @@ const RTKApp = () => {
 
   return (
     // <NBApp theme={theme}>
-    <App />
+    <UserProvider>
+      <App />
+    </UserProvider>
     // </NBApp>
   );
 };

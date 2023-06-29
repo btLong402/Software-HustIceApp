@@ -1,6 +1,11 @@
-import {View, TouchableWithoutFeedback} from 'react-native';
-import React, {Component} from 'react';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import {
+  View,
+  TouchableWithoutFeedback,
+  Animated,
+  SafeAreaView,
+  StyleSheet,
+} from 'react-native';
+import React, {useRef} from 'react';
 import {
   Box,
   Flex,
@@ -18,6 +23,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 // import {TouchableOpacity} from 'react-native-gesture-handler';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import { useUser } from '../../context/userContext';
 
 const MeHStack = ({icon, name}) => {
   return (
@@ -69,11 +75,31 @@ const BadgeNumber = ({number}) => {
     </Box>
   );
 };
+const Header_Max_Height = 104;
 export default MeScreen = ({navigation}) => {
+  const {user:userProfile} = useUser();
+  let scrollOffsetY = useRef(new Animated.Value(0)).current;
+  const animateHeaderHeight = scrollOffsetY.interpolate({
+    inputRange: [0, Header_Max_Height / 3],
+    outputRange: [Header_Max_Height, 0],
+    extrapolate: 'clamp',
+  });
   return (
-    <View flex={1}>
-      <Box backgroundColor={'crimson'}>
-        <VStack>
+    <View
+      style={{
+        position: 'relative',
+        flex: 1,
+      }}>
+      <Animated.View
+        style={{
+          height: animateHeaderHeight,
+          backgroundColor: 'crimson',
+        }}>
+        <VStack
+          style={{
+            position: 'absolute',
+            bottom: 0,
+          }}>
           <HStack
             justifyContent="start"
             marginBottom={'5'}
@@ -86,7 +112,7 @@ export default MeScreen = ({navigation}) => {
                 marginX={'3'}
                 size="md"
                 source={{
-                  uri: 'https://ichef.bbci.co.uk/news/976/cpsprodpb/16620/production/_91408619_55df76d5-2245-41c1-8031-07a4da3f313f.jpg.webp',
+                  uri: userProfile.avatar.uri,
                 }}
                 alt="Avatar"
                 borderRadius="full"
@@ -94,7 +120,7 @@ export default MeScreen = ({navigation}) => {
             </TouchableWithoutFeedback>
             <VStack justifyContent={'start'} space={1}>
               <Text fontSize="xl" color="white" fontWeight={'bold'}>
-                Nguyen Van Pepe
+                {userProfile.fullname}
               </Text>
               <Box alignSelf={'flex-start'}>
                 <LinearGradient
@@ -122,9 +148,16 @@ export default MeScreen = ({navigation}) => {
             </VStack>
           </HStack>
         </VStack>
-      </Box>
-
-      <ScrollView backgroundColor={'#ececec'} py={2}>
+      </Animated.View>
+      <ScrollView
+        scrollEventThrottle={16}
+        onScroll={Animated.event(
+          [{nativeEvent: {contentOffset: {y: scrollOffsetY}}}],
+          {useNativeDriver: false},
+        )}
+        backgroundColor={'#ececec'}
+        py={2}
+        showsVerticalScrollIndicator={false}>
         <VStack
           backgroundColor={'white'}
           shadow={{

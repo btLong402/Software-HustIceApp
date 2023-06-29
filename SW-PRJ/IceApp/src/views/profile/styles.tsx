@@ -7,6 +7,7 @@ export const styles = StyleSheet.create({
     paddingTop: StatusBar.currentHeight,
   },
   avatarContainer: {
+    paddingTop: 20,
     alignItems: 'center',
     flex: 1,
     backgroundColor: 'crimson',
@@ -27,10 +28,8 @@ export const styles = StyleSheet.create({
   infoContainer: {
     // marginTop: 40,
     backgroundColor: 'white',
-    // borderTopLeftRadius: 30,
-    // borderTopRightRadius: 30,
     flex: 3,
-    paddingVertical: 30,
+    paddingVertical: 10,
     paddingHorizontal: 15,
     elevation: 4,
     shadowColor: '#000',

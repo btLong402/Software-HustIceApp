@@ -2,6 +2,7 @@ import {
   Image,
   View,
   SafeAreaView,
+  TouchableWithoutFeedback,
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
@@ -12,6 +13,8 @@ import DatePicker from 'react-native-date-picker';
 import {useToast, Box, Text, HStack} from 'native-base';
 import {ImagePickerModal} from './ImagePickerModal';
 import ImagePicker from 'react-native-image-crop-picker';
+import {useUser} from '../../context/userContext';
+
 export const convertGender = (type: number) => {
   switch (type) {
     case 0:
@@ -24,18 +27,9 @@ export const convertGender = (type: number) => {
       return 'Unknown';
   }
 };
-const initImagePath: string =
-  'https://ichef.bbci.co.uk/news/976/cpsprodpb/16620/production/_91408619_55df76d5-2245-41c1-8031-07a4da3f313f.jpg.webp';
+
 const ProfileScreen = ({navigation}) => {
-  // const {value} = route.params;
-  const userProfile = {
-    fullname: 'Nguyen Van Pepe',
-    email: 'pepe@gmail.com',
-    phone: '0123456789',
-    dob: new Date('1999-01-01'),
-    gender: 1,
-    associationAccount: null,
-  };
+  const {user: userProfile, dispatch, USER_REDUCER_TYPE} = useUser();
 
   useLayoutEffect(() => {
     const headerLeft = () => (
@@ -63,7 +57,7 @@ const ProfileScreen = ({navigation}) => {
       headerRight: () => (
         <TouchableOpacity>
           <Text
-            fontWeight={'semiBold'}
+            fontWeight={'500'}
             style={{
               marginRight: 10,
               fontSize: 20,
@@ -80,9 +74,7 @@ const ProfileScreen = ({navigation}) => {
     });
   }, [navigation]);
 
-  const [imagePath, setImagePath] = useState<string>(initImagePath);
   const [visible, setVisible] = useState(false);
-
   const [openDatePicker, setOpenDatePicker] = useState(false);
   const toast = useToast();
 
@@ -93,7 +85,16 @@ const ProfileScreen = ({navigation}) => {
       cropping: true,
     })
       .then(image => {
-        setImagePath(image.path);
+        setVisible(false);
+        dispatch({
+          type: USER_REDUCER_TYPE.UPDATE_AVATAR,
+          payload: {
+            uri: image.path,
+            type: image.mime,
+            name: image.filename,
+            size: image.size,
+          },
+        });
       })
       .catch(err => {
         toast.show({
@@ -159,19 +160,18 @@ const ProfileScreen = ({navigation}) => {
       <SafeAreaView style={{flex: 1}}>
         <View style={styles.avatarContainer}>
           <View>
-            <TouchableOpacity onPress={() => setVisible(true)}>
+            <TouchableWithoutFeedback onPress={() => setVisible(true)}>
               <Image
                 style={styles.avatar}
                 source={{
-                  uri: imagePath,
+                  uri: userProfile.avatar.uri,
                 }}
               />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setVisible(true)}>
+            </TouchableWithoutFeedback>
+            <TouchableWithoutFeedback onPress={() => setVisible(true)}>
               <Text
                 style={{
-                  marginTop: 10,
-                  padding: 5,
+                  padding: 10,
                   fontWeight: 500,
                   color: 'white',
                   textAlign: 'center',
@@ -179,45 +179,47 @@ const ProfileScreen = ({navigation}) => {
                 }}>
                 Edit
               </Text>
-            </TouchableOpacity>
+            </TouchableWithoutFeedback>
           </View>
         </View>
 
         <View style={styles.infoContainer}>
-          <ProfileRow
-            label="Fullname"
-            value={userProfile.fullname}
-            navigation={navigation}
-            onClick={handleClickChangeType}
-          />
-          <ProfileRow
-            label="Email"
-            value={userProfile.email}
-            navigation={navigation}
-            onClick={handleClickChangeType}
-          />
-          <ProfileRow
-            label="Phone"
-            value={userProfile.phone}
-            navigation={navigation}
-            onClick={handleClickChangeType}
-          />
-          <ProfileRow
-            label="Gender"
-            value={userProfile.gender}
-            navigation={navigation}
-            onClick={handleClickChangeType}
-          />
-          <ProfileRow
-            label="Date of Birth"
-            value={userProfile.dob}
-            onClick={handleClickChangeType}
-          />
-          <ProfileRow
-            label="Association Account"
-            value="@example"
-            onClick={handleClickChangeType}
-          />
+          <View>
+            <ProfileRow
+              label="Fullname"
+              value={userProfile.fullname}
+              navigation={navigation}
+              onClick={handleClickChangeType}
+            />
+            <ProfileRow
+              label="Email"
+              value={userProfile.email}
+              navigation={navigation}
+              onClick={handleClickChangeType}
+            />
+            <ProfileRow
+              label="Phone"
+              value={userProfile.phone}
+              navigation={navigation}
+              onClick={handleClickChangeType}
+            />
+            <ProfileRow
+              label="Gender"
+              value={userProfile.gender}
+              navigation={navigation}
+              onClick={handleClickChangeType}
+            />
+            <ProfileRow
+              label="Date of Birth"
+              value={userProfile.dob}
+              onClick={handleClickChangeType}
+            />
+            <ProfileRow
+              label="Association Account"
+              value="@example"
+              onClick={handleClickChangeType}
+            />
+          </View>
         </View>
       </SafeAreaView>
       {/* {openGenderPicker && GenderPicker} */}
@@ -226,9 +228,14 @@ const ProfileScreen = ({navigation}) => {
         mode="date"
         open={openDatePicker}
         date={userProfile.dob}
+        key={userProfile.dob.toISOString()}
+        display={'compact'}
         onConfirm={date => {
           setOpenDatePicker(false);
-          // setDate(date)
+          dispatch({
+            type: USER_REDUCER_TYPE.UPDATE_DOB,
+            payload: date,
+          });
         }}
         onCancel={() => {
           setOpenDatePicker(false);
