@@ -17,7 +17,7 @@ const handlePress = () => {
 const SignIn = () => (
   <View style={styles.container}>
     <Image
-      source={require('../../components/images/logo.png')}
+      source={require('../../assets/images/logo.png')}
       style={styles.logo}
     />
     <View style={styles.text_input}>
@@ -37,15 +37,15 @@ const SignIn = () => (
     <Text style={styles.h3}>Sign in with</Text>
     <View style={styles.social_sign_in}>
       <TouchableOpacity style={styles.social_btn} onPress={handlePress}>
-        <Image source={require('../../components/images/Facebook.png')} />
+        <Image source={require('../../assets/images/Facebook.png')} />
       </TouchableOpacity>
       <TouchableOpacity style={styles.social_btn} onPress={handlePress}>
-        <Image source={require('../../components/images/Google.png')} />
+        <Image source={require('../../assets/images/Google.png')} />
       </TouchableOpacity>
     </View>
     <View style={styles.footer}>
       <TouchableOpacity style={styles.footer_btn} onPress={handlePress}>
-        <Image source={require('../../components/images/Vector-up.png')} />
+        <Image source={require('../../assets/images/Vector-up.png')} />
         <Text style={styles.h1}>Sign Up</Text>
       </TouchableOpacity>
     </View>

@@ -1,4 +1,11 @@
 {
   "name": "IceApp",
-  "displayName": "IceApp"
+  "displayName": "IceApp",
+  "expo": {
+    "ios": {
+      "config": {
+        "usesNonExemptEncryption": false
+      }
+    }
+  }
 }

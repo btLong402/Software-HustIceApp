@@ -3,15 +3,13 @@ import React, {useEffect} from 'react';
 import {View, Text, Image, StyleSheet, TouchableOpacity} from 'react-native';
 // import {useNavigation} from '@react-navigation/native';
 function Splash(): JSX.Element {
-  const handleClick = () =>{
-
-  }
+  const handleClick = () => {};
   return (
     <View style={styles.container}>
       <View style={styles.logo}>
         <Image
           style={styles.img}
-          source={require('../components/images/logo.png')}
+          source={require('../assets/images/logo.png')}
         />
       </View>
       <View style={styles.body}>
@@ -21,9 +19,9 @@ function Splash(): JSX.Element {
         <Text style={styles.h2}>in little or no time.</Text>
       </View>
       <View style={styles.footer}>
-        <TouchableOpacity style={styles.btn}>
-          <Image source={require('../components/images/Vector.png')} />
-        </TouchableOpacity>
+        {/* <TouchableOpacity style={styles.btn}>
+          <Image source={require('../assets/images/Vector.png')} />
+        </TouchableOpacity> */}
       </View>
     </View>
   );
@@ -43,7 +41,6 @@ const styles = StyleSheet.create({
   },
   body: {
     alignItems: 'center',
-
   },
   h1: {
     fontStyle: 'normal',
@@ -70,7 +67,7 @@ const styles = StyleSheet.create({
     borderRadius: 34,
     backgroundColor: 'white',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
 });
 export default Splash;

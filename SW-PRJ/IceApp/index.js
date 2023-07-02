@@ -16,6 +16,7 @@ import {
 import type {StorageManager} from 'native-base';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {UserProvider} from './src/context/userContext';
+import AuthContext, {AuthProvider} from './src/context/authContext';
 
 const theme = {
   colors: {
@@ -65,13 +66,7 @@ const NBApp = ({children, theme}: any) => {
 const RTKApp = () => {
   const {colorMode, toggleColorMode} = useColorMode();
 
-  return (
-    // <NBApp theme={theme}>
-    <UserProvider>
-      <App />
-    </UserProvider>
-    // </NBApp>
-  );
+  return <App />;
 };
 
 AppRegistry.registerComponent(appName, () => RTKApp);

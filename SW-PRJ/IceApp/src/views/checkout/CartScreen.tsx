@@ -11,6 +11,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Spacer from '../../components/Spacer';
 import Seperator from '../../components/Seperator';
 import styles from './styles';
+import {Image} from 'react-native';
 
 const PriceSegment = () => {
   return (
@@ -55,9 +56,11 @@ const ProdSegment = () => {
             return (
               <View key={index}>
                 <View style={styles.row}>
-                  <img
+                  <Image
                     style={localStyles.prodImage}
-                    src="https://tea-3.lozi.vn/v1/ship/resized/test-huongg-lam-dong-1637048248725161849-supper-sundae-dau-tay-0-1680061286?w=640&type=o"
+                    source={{
+                      uri: 'https://tea-3.lozi.vn/v1/ship/resized/test-huongg-lam-dong-1637048248725161849-supper-sundae-dau-tay-0-1680061286?w=640&type=o',
+                    }}
                   />
                   <View style={localStyles.prodInfo}>
                     <Text
