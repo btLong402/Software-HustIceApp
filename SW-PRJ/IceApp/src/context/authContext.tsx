@@ -1,60 +1,106 @@
 import React from 'react';
-import * as SecureStore from 'expo-secure-store';
+import AuthService from '../services/auth.service';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  AuthContextProps,
+  LoginResponse,
+  RegisterResponse,
+  AuthState,
+} from '../utils/types';
 
-const initState = {
+const initState: AuthState = {
   token: null,
-  isSignout: false,
-  user: null,
+  isSignout: true,
+  username: null,
   isLoading: true,
+  mess: null,
 };
 
 const AuthContext = React.createContext(initState);
 
-interface AuthContextProps {
-  signIn: (data: {username: string; password: string}) => Promise<void>;
-  signOut: () => void;
-  signUp: (data: {username: string; password: string}) => Promise<void>;
-}
 export const useAuth = () => React.useContext(AuthContext);
+
+export enum AuthActionType {
+  SIGN_IN = 'SIGN_IN',
+  SIGN_OUT = 'SIGN_OUT',
+  RESTORE_TOKEN = 'RESTORE_TOKEN',
+  GET_MESS = 'GET_MESS',
+  IS_LOADING = 'IS_LOADING',
+  SIGN_UP = 'SIGN_UP',
+  LOADED = 'LOADED',
+}
 
 export const AuthProvider = ({children}) => {
   const [state, dispatch] = React.useReducer((prevState, action) => {
     switch (action.type) {
+      case 'IS_LOADING':
+        return {
+          ...prevState,
+          isLoading: true,
+        };
+      case 'LOADED':
+        return {
+          ...prevState,
+          isLoading: false,
+        };
       case 'RESTORE_TOKEN':
         return {
           ...prevState,
-          user: action.user,
+          username: action.username,
           token: action.token,
-          isLoading: false,
+          isSignout: action.token === null,
+          mess: null,
         };
       case 'SIGN_IN':
         return {
           ...prevState,
           isSignout: false,
-          user: action.user,
+          username: action.username,
           token: action.token,
+          mess: {
+            type: 'success',
+            message: 'Login successfully',
+          },
         };
       case 'SIGN_OUT':
         return {
           ...prevState,
           isSignout: true,
-          user: null,
+          username: null,
           token: null,
+          mess: null,
+        };
+      case 'SIGN_UP':
+        return {
+          ...prevState,
+          mess: {
+            type: 'success',
+            message: 'Register successfully',
+          },
+        };
+      case 'GET_MESS':
+        return {
+          ...prevState,
+          mess: {
+            type: 'error',
+            message: action.mess,
+          },
         };
     }
   }, initState);
 
   React.useEffect(() => {
     const bootstrapAsync = async () => {
-      let userToken;
-      let userInfo;
+      dispatch({type: AuthActionType.IS_LOADING});
       try {
-        userToken = await SecureStore.getItemAsync('userToken');
-        userInfo = await SecureStore.getItemAsync('userInfo');
-      } catch (e) {
-        console.log(e);
+        const token = await AsyncStorage.getItem('token');
+        const username = await AsyncStorage.getItem('username');
+        dispatch({type: AuthActionType.RESTORE_TOKEN, token, username});
+      } catch (e: any) {
+        dispatch({type: AuthActionType.GET_MESS, mess: 'Error loading app'});
+      } finally {
+        dispatch({type: AuthActionType.LOADED});
       }
-      dispatch({type: 'RESTORE_TOKEN', token: userToken, user: userInfo});
     };
     bootstrapAsync();
   }, []);
@@ -62,25 +108,51 @@ export const AuthProvider = ({children}) => {
   const authContext: AuthContextProps = React.useMemo(
     () => ({
       signIn: async data => {
-        // const responseData = await signIn({data.username, data.password});
-        // if (responseData) {
-        //     dispatch({
-        //         type: 'SIGN_IN',
-        //         token: responseData.token,
-        //         user: responseData.user,
-        //       });
-        // }
+        try {
+          const resData: LoginResponse = await AuthService.login(data);
+          console.log(resData);
+          if (resData.status === 'OK') {
+            dispatch({
+              type: AuthActionType.SIGN_IN,
+              token: resData.data.token,
+              username: resData.data.username,
+            });
+          } else if (resData.status === 'ERROR') {
+            dispatch({
+              type: AuthActionType.GET_MESS,
+              mess: resData.data.message,
+            });
+          }
+        } catch (e) {
+          dispatch({
+            type: AuthActionType.GET_MESS,
+            mess: e.message,
+          });
+        }
       },
-      signOut: () => dispatch({type: 'SIGN_OUT'}),
+      signOut: async () => {
+        await AuthService.logout();
+        dispatch({type: 'SIGN_OUT'});
+      },
       signUp: async data => {
-        // const responseData = await signUp({data.username, data.password});
-        // if (responseData) {
-        //     dispatch({
-        //         type: 'SIGN_IN',
-        //         token: responseData.token,
-        //         user: responseData.user,
-        //       });
-        // }
+        try {
+          const resData: RegisterResponse = await AuthService.register(data);
+          if (resData.status === 'OK') {
+            dispatch({
+              type: AuthActionType.SIGN_UP,
+            });
+          } else if (resData.status === 'ERROR') {
+            dispatch({
+              type: AuthActionType.GET_MESS,
+              mess: resData.data,
+            });
+          }
+        } catch (e) {
+          dispatch({
+            type: AuthActionType.GET_MESS,
+            mess: e.message,
+          });
+        }
       },
     }),
     [],

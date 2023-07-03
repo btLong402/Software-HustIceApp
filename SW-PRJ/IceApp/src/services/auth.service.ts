@@ -1,38 +1,77 @@
 import axios from 'axios';
-import axiosClient from './api';
+import axiosClient, {config} from './api';
 import {setAppAccessToken} from './api';
-import * as SecureStore from 'expo-secure-store';
-export const login = (data: any) => {
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {API_STATUS} from '../utils/constants';
+
+const login = (data: any) => {
+  console.log('test: ', axiosClient);
   return axiosClient({
     method: 'POST',
-    url: '/auth/login',
+    url: '/user/login',
     data: data,
   })
     .then(async response => {
-      if (response.status === 200) {
-        if (response.data.accessToken) {
-          setAppAccessToken(response.data.accessToken);
+      console.log('response: ', response.status);
+      if (response.status === API_STATUS.SUCCESS) {
+        console.log('response: ', response.headers);
+        if (response.headers['token']) {
+          setAppAccessToken(response.data.token);
+          await AsyncStorage.setItem('token', response.data.token);
+          await AsyncStorage.setItem('username', response.data.username);
+          return {
+            status: 'OK',
+            data: response.data,
+          };
+        } else {
+          return {
+            status: 'ERROR',
+            data: 'Token not found',
+          };
         }
-        return response.data;
       }
     })
     .catch(error => {
-      return error.response.data;
+      return {
+        status: 'ERROR',
+        data: error.response.data,
+      };
     });
 };
 
-export const register = (data: any) => {
-  return axios({
-    method: 'POST',
-    url: '/auth/register',
-    data: data,
-  })
+const register = (data: any) => {
+  // console.log('data: ', data);
+  return axios
+    .create(config)({
+      method: 'POST',
+      url: '/user/register',
+      data: data,
+    })
     .then(response => {
-      if (response.status === 200) {
-        return response.data;
+      console.log('response: ', response.status);
+      if (response.status === API_STATUS.SUCCESS) {
+        return {
+          status: 'OK',
+        };
       }
     })
     .catch(error => {
-      return error.response.data;
+      console.log('error', error.response.data);
+      return {
+        status: 'ERROR',
+        data: error.response.data,
+      };
     });
+};
+
+const logout = async () => {
+  await AsyncStorage.removeItem('token');
+  await AsyncStorage.removeItem('username');
+  // await AsyncStorage.removeItem('refreshToken');
+};
+
+export default {
+  login,
+  register,
+  logout,
 };

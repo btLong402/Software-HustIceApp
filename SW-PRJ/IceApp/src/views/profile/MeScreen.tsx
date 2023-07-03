@@ -4,6 +4,7 @@ import {
   Animated,
   SafeAreaView,
   StyleSheet,
+  Dimensions,
 } from 'react-native';
 import React, {useRef} from 'react';
 import {
@@ -23,7 +24,9 @@ import LinearGradient from 'react-native-linear-gradient';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 // import {TouchableOpacity} from 'react-native-gesture-handler';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { useUser } from '../../context/userContext';
+import {useUser} from '../../context/userContext';
+import {useAuth} from '../../context/authContext';
+import CheckSignOutTouchable from '../../components/CheckSignOutTouchable';
 
 const MeHStack = ({icon, name}) => {
   return (
@@ -77,7 +80,9 @@ const BadgeNumber = ({number}) => {
 };
 const Header_Max_Height = 104;
 export default MeScreen = ({navigation}) => {
-  const {user:userProfile} = useUser();
+  const {isSignout} = useAuth();
+  console.log('isSignout: ', isSignout);
+  const {user: userProfile} = useUser();
   let scrollOffsetY = useRef(new Animated.Value(0)).current;
   const animateHeaderHeight = scrollOffsetY.interpolate({
     inputRange: [0, Header_Max_Height / 3],
@@ -100,53 +105,92 @@ export default MeScreen = ({navigation}) => {
             position: 'absolute',
             bottom: 0,
           }}>
-          <HStack
-            justifyContent="start"
-            marginBottom={'5'}
-            alignItems={'center'}>
-            <TouchableWithoutFeedback
-              onPress={() => {
-                navigation.navigate('Profile');
-              }}>
-              <Image
-                marginX={'3'}
-                size="md"
-                source={{
-                  uri: userProfile.avatar.uri,
-                }}
-                alt="Avatar"
-                borderRadius="full"
-              />
-            </TouchableWithoutFeedback>
-            <VStack justifyContent={'start'} space={1}>
-              <Text fontSize="xl" color="white" fontWeight={'bold'}>
-                {userProfile.fullname}
-              </Text>
-              <Box alignSelf={'flex-start'}>
-                <LinearGradient
-                  colors={['#EAEAEA', '#D6D6D6', '#C4C4C4']}
-                  style={{
-                    borderRadius: 20,
-                  }}>
-                  <HStack
-                    space={2}
-                    px={2}
-                    py={0.5}
-                    alignItems="center"
-                    justifyContent="start">
-                    <Text color="#1e2a3b">Silver member</Text>
-                    <Anticons name={'right'} size={14} color={'#1e2a3b'} />
-                  </HStack>
-                </LinearGradient>
-              </Box>
-              <Text color="white">
-                <Text fontWeight={'bold'} fontSize={'md'}>
-                  1000
+          {!isSignout ? (
+            <HStack
+              justifyContent="flex-start"
+              marginBottom={'5'}
+              alignItems={'center'}>
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  navigation.navigate('Profile');
+                }}>
+                <Image
+                  marginX={'3'}
+                  size="md"
+                  source={{
+                    uri: userProfile.avatar.uri,
+                  }}
+                  alt="Avatar"
+                  borderRadius="full"
+                />
+              </TouchableWithoutFeedback>
+              <VStack justifyContent={'start'} space={1}>
+                <Text fontSize="xl" color="white" fontWeight={'bold'}>
+                  {userProfile.fullname}
                 </Text>
-                <Text> points</Text>
-              </Text>
-            </VStack>
-          </HStack>
+                <Box alignSelf={'flex-start'}>
+                  <LinearGradient
+                    colors={['#EAEAEA', '#D6D6D6', '#C4C4C4']}
+                    style={{
+                      borderRadius: 20,
+                    }}>
+                    <HStack
+                      space={2}
+                      px={2}
+                      py={0.5}
+                      alignItems="center"
+                      justifyContent="start">
+                      <Text color="#1e2a3b">Silver member</Text>
+                      <Anticons name={'right'} size={14} color={'#1e2a3b'} />
+                    </HStack>
+                  </LinearGradient>
+                </Box>
+                <Text color="white">
+                  <Text fontWeight={'bold'} fontSize={'md'}>
+                    1000
+                  </Text>
+                  <Text> points</Text>
+                </Text>
+              </VStack>
+            </HStack>
+          ) : (
+            <HStack
+              width={Dimensions.get('window').width}
+              justifyContent="flex-end"
+              marginBottom={'5'}
+              // marginX={'3'}
+              paddingRight={'3'}
+              space={3}>
+              <TouchableWithoutFeedback
+                onPress={() => navigation.navigate('SignIn')}>
+                <Box
+                  bgColor="white"
+                  paddingX={2}
+                  paddingY={1}
+                  borderRadius={2}
+                  borderColor={'white'}
+                  borderWidth={1}>
+                  <Text fontSize="xl" color="crimson" fontWeight={'bold'}>
+                    Sign in
+                  </Text>
+                </Box>
+              </TouchableWithoutFeedback>
+              <TouchableWithoutFeedback
+                onPress={() => navigation.navigate('SignUp')}>
+                <Box
+                  bgColor="crimson"
+                  paddingX={2}
+                  paddingY={1}
+                  borderRadius={2}
+                  borderColor={'white'}
+                  borderWidth={1}>
+                  <Text fontSize="xl" color="white" fontWeight={'bold'}>
+                    Sign up
+                  </Text>
+                </Box>
+              </TouchableWithoutFeedback>
+            </HStack>
+          )}
         </VStack>
       </Animated.View>
       <ScrollView
@@ -170,74 +214,152 @@ export default MeScreen = ({navigation}) => {
             shadowRadius: 1,
             // marginBottom: ,
           }}>
-          <HStack justifyContent="space-between" py={4} px={2}>
+          <CheckSignOutTouchable navigation={navigation}>
+            <HStack justifyContent="space-between" py={4} px={2}>
+              <HStack
+                alignItems={'center'}
+                space={1}
+                justifyContent={'flex-start'}>
+                <Ionicons
+                  name={'clipboard-outline'}
+                  size={32}
+                  color={'#29538f'}
+                />
+                <Text fontSize={'lg'} fontWeight={'medium'}>
+                  My Purchases
+                </Text>
+              </HStack>
+              <HStack
+                alignItems={'center'}
+                space={1}
+                justifyContent={'flex-end'}>
+                <Text fontSize={'sm'} fontWeight={'light'}>
+                  View Purchase History
+                </Text>
+                <Anticons name={'right'} size={18} color={'#1e2a3b'} />
+              </HStack>
+            </HStack>
+          </CheckSignOutTouchable>
+          <Divider width={'95%'} alignSelf={'center'} />
+          {!isSignout && (
             <HStack
               alignItems={'center'}
-              space={1}
-              justifyContent={'flex-start'}>
-              <Ionicons
-                name={'clipboard-outline'}
-                size={32}
-                color={'#29538f'}
-              />
-              <Text fontSize={'lg'} fontWeight={'medium'}>
-                My Purchases
-              </Text>
+              justifyContent={'space-around'}
+              py={4}
+              px={2}>
+              <VStack alignItems={'center'} space={4}>
+                <Box>
+                  <BadgeNumber number={1} />
+                  <MaterialIcons name={'payment'} size={35} color={'#5d5d5d'} />
+                </Box>
+                <Text fontSize={'sm'} fontWeight={'light'}>
+                  To pay
+                </Text>
+              </VStack>
+              <VStack alignItems={'center'} space={4}>
+                <Box>
+                  <BadgeNumber number={12} />
+                  <Anticons name={'inbox'} size={35} color={'#5d5d5d'} />
+                </Box>
+                <Text fontSize={'sm'} fontWeight={'light'}>
+                  To Ship
+                </Text>
+              </VStack>
+              <VStack alignItems={'center'} space={4}>
+                <Box>
+                  <BadgeNumber number={120} />
+                  <MaterialIcons
+                    name={'local-shipping'}
+                    size={35}
+                    color={'#5d5d5d'}
+                  />
+                </Box>
+                <Text fontSize={'sm'} fontWeight={'light'}>
+                  To Receive
+                </Text>
+              </VStack>
+              <VStack alignItems={'center'} space={4}>
+                <Box>
+                  <BadgeNumber number={12} />
+                  <Anticons name={'staro'} size={35} color={'#5d5d5d'} />
+                </Box>
+                <Text fontSize={'sm'} fontWeight={'light'}>
+                  To Rate
+                </Text>
+              </VStack>
             </HStack>
-            <HStack alignItems={'center'} space={1} justifyContent={'flex-end'}>
-              <Text fontSize={'sm'} fontWeight={'light'}>
-                View Purchase History
-              </Text>
-              <Anticons name={'right'} size={18} color={'#1e2a3b'} />
-            </HStack>
-          </HStack>
-          <Divider width={'95%'} alignSelf={'center'} />
-          <HStack
-            alignItems={'center'}
-            justifyContent={'space-around'}
-            py={4}
-            px={2}>
-            <VStack alignItems={'center'} space={4}>
-              <Box>
-                <BadgeNumber number={1} />
-                <MaterialIcons name={'payment'} size={35} color={'#5d5d5d'} />
-              </Box>
-              <Text fontSize={'sm'} fontWeight={'light'}>
-                To pay
-              </Text>
-            </VStack>
-            <VStack alignItems={'center'} space={4}>
-              <Box>
-                <BadgeNumber number={12} />
-                <Anticons name={'inbox'} size={35} color={'#5d5d5d'} />
-              </Box>
-              <Text fontSize={'sm'} fontWeight={'light'}>
-                To Ship
-              </Text>
-            </VStack>
-            <VStack alignItems={'center'} space={4}>
-              <Box>
-                <BadgeNumber number={120} />
-                <MaterialIcons
-                  name={'local-shipping'}
-                  size={35}
-                  color={'#5d5d5d'}
+          )}
+        </VStack>
+        <VStack
+          backgroundColor={'white'}
+          mt={3}
+          shadow={{
+            shadowColor: '#000',
+            shadowOffset: {
+              width: 0,
+              height: 1,
+            },
+            shadowOpacity: 0.25,
+            shadowRadius: 1,
+          }}>
+          <CheckSignOutTouchable navigation={navigation}>
+            <MeHStack
+              icon={
+                <Anticons
+                  name={'wallet'}
+                  size={28}
+                  style={{
+                    color: 'crimson',
+                  }}
                 />
-              </Box>
-              <Text fontSize={'sm'} fontWeight={'light'}>
-                To Receive
-              </Text>
-            </VStack>
-            <VStack alignItems={'center'} space={4}>
-              <Box>
-                <BadgeNumber number={12} />
-                <Anticons name={'staro'} size={35} color={'#5d5d5d'} />
-              </Box>
-              <Text fontSize={'sm'} fontWeight={'light'}>
-                To Rate
-              </Text>
-            </VStack>
-          </HStack>
+              }
+              name={'My wallet'}
+            />
+          </CheckSignOutTouchable>
+          <CheckSignOutTouchable navigation={navigation}>
+            <MeHStack
+              icon={
+                <Anticons
+                  name={'hearto'}
+                  size={28}
+                  style={{
+                    color: 'orange',
+                  }}
+                />
+              }
+              name={'My likes'}
+            />
+          </CheckSignOutTouchable>
+          <CheckSignOutTouchable navigation={navigation}>
+            <MeHStack
+              icon={
+                <Anticons
+                  name={'clockcircleo'}
+                  size={28}
+                  style={{
+                    color: 'blue',
+                    opacity: 0.6,
+                  }}
+                />
+              }
+              name={'Recently viewed'}
+            />
+          </CheckSignOutTouchable>
+          <CheckSignOutTouchable navigation={navigation}>
+            <MeHStack
+              icon={
+                <Anticons
+                  name={'staro'}
+                  size={28}
+                  style={{
+                    color: 'green',
+                    opacity: 0.6,
+                  }}
+                />
+              }
+              name={'My Rating'}
+            />
+          </CheckSignOutTouchable>
         </VStack>
         <VStack
           backgroundColor={'white'}
@@ -251,82 +373,23 @@ export default MeScreen = ({navigation}) => {
             shadowOpacity: 0.25,
             shadowRadius: 1,
           }}>
-          <MeHStack
-            icon={
-              <Anticons
-                name={'wallet'}
-                size={28}
-                style={{
-                  color: 'crimson',
-                }}
-              />
-            }
-            name={'My wallet'}
-          />
-          <MeHStack
-            icon={
-              <Anticons
-                name={'hearto'}
-                size={28}
-                style={{
-                  color: 'orange',
-                }}
-              />
-            }
-            name={'My likes'}
-          />
-          <MeHStack
-            icon={
-              <Anticons
-                name={'clockcircleo'}
-                size={28}
-                style={{
-                  color: 'blue',
-                  opacity: 0.6,
-                }}
-              />
-            }
-            name={'Recently viewed'}
-          />
-          <MeHStack
-            icon={
-              <Anticons
-                name={'staro'}
-                size={28}
-                style={{
-                  color: 'green',
-                  opacity: 0.6,
-                }}
-              />
-            }
-            name={'My Rating'}
-          />
-        </VStack>
-        <VStack
-          backgroundColor={'white'}
-          mt={3}
-          shadow={{
-            shadowColor: '#000',
-            shadowOffset: {
-              width: 0,
-              height: 1,
-            },
-            shadowOpacity: 0.25,
-            shadowRadius: 1,
-          }}>
-          <MeHStack
-            icon={
-              <Anticons
-                name={'setting'}
-                size={28}
-                style={{
-                  color: 'blue',
-                  opacity: 0.6,
-                }}
-              />
-            }
-            name={'Account Settings'}
-          />
+          <CheckSignOutTouchable
+            navigation={navigation}
+            authPageName="Account Setting">
+            <MeHStack
+              icon={
+                <Anticons
+                  name={'setting'}
+                  size={28}
+                  style={{
+                    color: 'blue',
+                    opacity: 0.6,
+                  }}
+                />
+              }
+              name={'Account Settings'}
+            />
+          </CheckSignOutTouchable>
           <MeHStack
             icon={
               <Anticons

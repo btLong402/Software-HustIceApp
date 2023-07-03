@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -7,56 +7,196 @@ import {
   Image,
   StyleSheet,
   TextInput,
+  Button,
+  ScrollView,
 } from 'react-native';
-
+import {Popover, useToast, Box, VStack} from 'native-base';
+import {Formik} from 'formik';
+import * as yup from 'yup';
+import {useAuth} from '../../context/authContext';
+import AntIcon from 'react-native-vector-icons/AntDesign';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import {useLayoutEffect} from 'react';
 const handlePress = () => {
   console.log('Forgot password pressed');
   // Add your forgot password logic here
 };
+const phoneRegex =
+  '^(0|84)(2(0[3-9]|1[0-6|8|9]|2[0-2|5-9]|3[2-9]|4[0-9]|5[1|2|4-9]|6[0-3|9]|7[0-7]|8[0-9]|9[0-4|6|7|9])|3[2-9]|5[5|6|8|9]|7[0|6-9]|8[0-6|8|9]|9[0-4|6-9])([0-9]{7})$';
 
-const SignIn = () => (
-  <View style={styles.container}>
-    <Image
-      source={require('../../assets/images/logo.png')}
-      style={styles.logo}
-    />
-    <View style={styles.text_input}>
-      <View style={styles.input_border}>
-        <TextInput style={styles.input} placeholder="Email" />
-      </View>
-      <View style={styles.input_border}>
-        <TextInput style={styles.input} placeholder="Password" />
-      </View>
-      <TouchableOpacity style={styles.forgot_password} onPress={handlePress}>
-        <Text style={styles.h2}>Forgot Password?</Text>
-      </TouchableOpacity>
+const loginValidationSchema = yup.object().shape({
+  phoneNumber: yup
+    .string()
+    .matches(
+      new RegExp(phoneRegex),
+      'Phone number is a Vietnamese phone number with 10 digits',
+    ),
+  password: yup.string().min(6).max(50).required(),
+});
+
+const SignIn = ({navigation}) => {
+  const toast = useToast();
+
+  const {signIn, mess} = useAuth();
+  useLayoutEffect(() => {
+    const headerLeft = () => (
+      <Ionicons
+        name="arrow-back"
+        size={30}
+        color="crimson"
+        style={{marginLeft: 10}}
+        onPress={() => {
+          navigation.goBack();
+        }}
+      />
+    );
+    navigation.setOptions({
+      title: 'Log In',
+      headerLeft: headerLeft,
+      headerTintColor: 'black',
+      headerStyle: {
+        backgroundColor: 'white',
+      },
+      headerTitleStyle: {
+        fontSize: 20, // set the font size of the header title to 20
+        fontWeight: 500, // set the font weight of the header title to bold
+        letterSpacing: 1, // set the letter spacing to 0.5
+      },
+    });
+  }, [navigation]);
+
+  return (
+    <View style={styles.container}>
+      {/* <ScrollView> */}
+      <VStack alignItems={'center'} flex={1}>
+        <Image
+          source={require('../../assets/images/logo.png')}
+          style={styles.logo}
+        />
+        <Formik
+          validationSchema={loginValidationSchema}
+          initialValues={{phoneNumber: '', password: ''}}
+          onSubmit={async values => {
+            try {
+              await signIn({...values});
+              if (mess?.type) {
+                toast.show({
+                  placement: 'top',
+                  render: () => {
+                    return (
+                      <Box
+                        px="2"
+                        py="1"
+                        rounded="sm"
+                        mb={5}
+                        bgColor={
+                          mess.type === 'success' ? 'green.500' : 'red.200'
+                        }>
+                        {mess.message}
+                      </Box>
+                    );
+                  },
+                });
+                mess.type === 'success' && navigation.goBack();
+              }
+            } catch (error) {
+              toast.show({
+                placement: 'top',
+                render: () => {
+                  return (
+                    <Box px="2" py="1" rounded="sm" mb={5} bgColor={'red.200'}>
+                      {error.message}
+                    </Box>
+                  );
+                },
+              });
+            }
+          }}>
+          {({
+            handleChange,
+            handleBlur,
+            handleSubmit,
+            values,
+            errors,
+            touched,
+          }) => (
+            <>
+              <View style={styles.text_input}>
+                <View style={styles.input_border}>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Phone Number"
+                    onChangeText={handleChange('phoneNumber')}
+                    onBlur={handleBlur('phoneNumber')}
+                    value={values.phoneNumber}
+                  />
+                </View>
+                {errors.phoneNumber && touched.phoneNumber && (
+                  <Text
+                    style={StyleSheet.compose(styles.input_border, {
+                      color: 'red',
+                    })}>
+                    {errors.phoneNumber}
+                  </Text>
+                )}
+                <View style={styles.input_border}>
+                  <TextInput
+                    style={styles.input}
+                    secureTextEntry={true}
+                    placeholder="Password"
+                    onChangeText={handleChange('password')}
+                    onBlur={handleBlur('password')}
+                    value={values.password}
+                  />
+                </View>
+                {errors.password && touched.password && (
+                  <Text
+                    style={StyleSheet.compose(styles.input_border, {
+                      color: 'red',
+                    })}>
+                    {errors.password}
+                  </Text>
+                )}
+                <TouchableOpacity style={styles.forgot_password}>
+                  <Text style={styles.h2}>Forgot Password?</Text>
+                </TouchableOpacity>
+              </View>
+              <TouchableOpacity
+                style={styles.sign_in_btn}
+                onPress={handleSubmit}
+                disabled={errors.phoneNumber || errors.password}>
+                <Text style={styles.h1}>Eat Away!</Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </Formik>
+        {/* <Text style={styles.h3}>Sign in with</Text> */}
+        {/* <View style={styles.social_sign_in}>
+          <TouchableOpacity style={styles.social_btn} onPress={handlePress}>
+            <Image source={require('../../assets/images/Facebook.png')} />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.social_btn} onPress={handlePress}>
+            <Image source={require('../../assets/images/Google.png')} />
+          </TouchableOpacity>
+        </View> */}
+        <View style={styles.footer}>
+          <TouchableOpacity
+            style={styles.footer_btn}
+            onPress={() => navigation.navigate('SignUp')}>
+            <Image source={require('../../assets/images/Vector-up.png')} />
+            <Text style={styles.h1}>Sign Up</Text>
+          </TouchableOpacity>
+        </View>
+      </VStack>
+      {/* </ScrollView> */}
     </View>
-    <TouchableOpacity style={styles.sign_in_btn} onPress={handlePress}>
-      <Text style={styles.h1}>Eat Away!</Text>
-    </TouchableOpacity>
-    <Text style={styles.h3}>Sign in with</Text>
-    <View style={styles.social_sign_in}>
-      <TouchableOpacity style={styles.social_btn} onPress={handlePress}>
-        <Image source={require('../../assets/images/Facebook.png')} />
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.social_btn} onPress={handlePress}>
-        <Image source={require('../../assets/images/Google.png')} />
-      </TouchableOpacity>
-    </View>
-    <View style={styles.footer}>
-      <TouchableOpacity style={styles.footer_btn} onPress={handlePress}>
-        <Image source={require('../../assets/images/Vector-up.png')} />
-        <Text style={styles.h1}>Sign Up</Text>
-      </TouchableOpacity>
-    </View>
-  </View>
-);
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'crimson',
-    alignItems: 'center',
   },
   logo: {
     width: 250,
@@ -71,10 +211,15 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 25,
     marginVertical: 10,
+    paddingLeft: 15,
+    paddingRight: 10,
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   input: {
     flex: 1,
-    paddingLeft: 20,
   },
   forgot_password: {
     marginLeft: 140,
@@ -116,7 +261,8 @@ const styles = StyleSheet.create({
   },
   social_btn: {},
   footer: {
-    marginVertical: 218,
+    position: 'absolute',
+    bottom: 0,
   },
   footer_btn: {
     width: 345,
