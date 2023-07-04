@@ -1,9 +1,8 @@
 /* eslint-disable prettier/prettier */
-import React, {useEffect} from 'react';
-import {View, Text, Image, StyleSheet, TouchableOpacity} from 'react-native';
-// import {useNavigation} from '@react-navigation/native';
-function Splash(): JSX.Element {
-  const handleClick = () => {};
+/* eslint-disable react-hooks/exhaustive-deps */
+import React from 'react';
+import {View, Text, Image, StyleSheet, ActivityIndicator} from 'react-native';
+const Splash = ({navigation}: any) => {
   return (
     <View style={styles.container}>
       <View style={styles.logo}>
@@ -19,17 +18,15 @@ function Splash(): JSX.Element {
         <Text style={styles.h2}>in little or no time.</Text>
       </View>
       <View style={styles.footer}>
-        {/* <TouchableOpacity style={styles.btn}>
-          <Image source={require('../assets/images/Vector.png')} />
-        </TouchableOpacity> */}
+        <ActivityIndicator size="large" />
       </View>
     </View>
   );
-}
+};
+
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
-    height: '100%',
+    flex: 1,
     backgroundColor: 'crimson',
   },
   logo: {
@@ -70,4 +67,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
+
 export default Splash;

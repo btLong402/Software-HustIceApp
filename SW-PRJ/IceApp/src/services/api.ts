@@ -3,9 +3,11 @@ import Config from 'react-native-config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 // import {TOKEN} from '../utils/constants';
 import {API_STATUS} from '../utils/constants';
+import {Platform} from 'react-native';
 
+console.log('Config.API_URL_IOS: ', Config.API_URL_IOS);
 export const config = {
-  baseURL: Config.API_URL,
+  baseURL: Platform.OS === 'ios' ? Config.API_URL_IOS : Config.API_URL_AND,
   validateStatus: status => status >= 200 && status < 400,
   timeout: 60000,
 };
@@ -35,8 +37,7 @@ async function reloadApp() {
 const axiosClient = axios.create(config);
 
 export function setAppAccessToken(token) {
-  axiosClient.defaults.headers.common['TOKEN'] = token
-  ;
+  axiosClient.defaults.headers.common['TOKEN'] = token;
 }
 
 axiosClient.interceptors.response.use(

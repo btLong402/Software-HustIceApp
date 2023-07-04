@@ -8,9 +8,8 @@ export interface LoginResponse {
 }
 export interface AuthState {
   token: string | null;
-  isSignout: boolean;
+  isSignout: boolean | null;
   _id: string | null;
-  isLoading: boolean;
   mess: {
     type: string;
     message: string;

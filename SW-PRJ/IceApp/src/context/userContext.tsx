@@ -36,23 +36,9 @@ enum USER_REDUCER_TYPE {
   UPDATE_PHONE = 'UPDATE_PHONE',
   UPDATE_DOB = 'UPDATE_DOB',
   UPDATE_GENDER = 'UPDATE_GENDER',
-  // UPDATE_ASSOCIATION_ACCOUNT = 'UPDATE_ASSOCIATION_ACCOUNT',
   UPDATE_AVATAR = 'UPDATE_AVATAR',
   UPDATE_MANY = 'UPDATE_MANY',
 }
-
-// const initState: UserState = {
-//   fullname: 'Nguyen Van Pepe',
-//   email: 'pepe@gmail.com',
-//   phone: '0123456789',
-//   dob: new Date('1999-01-01'),
-//   gender: 1,
-//   level: 1,
-//   // associationAccount: null,
-//   avatar: {
-//     uri: 'https://ichef.bbci.co.uk/news/976/cpsprodpb/16620/production/_91408619_55df76d5-2245-41c1-8031-07a4da3f313f.jpg',
-//   },
-// };
 
 const initState: UserState = {
   fullname: null,
@@ -123,8 +109,9 @@ export const UserProvider = ({children}: UserProviderProps) => {
   const updateUserInfo = async (_id: string, data: UserState) => {
     console.log('updateUserInfo: ', data);
     const newData = await UserService.updateProfile(_id, data);
-    console.log(newData.data);
-    dispatch({type: USER_REDUCER_TYPE.UPDATE_MANY, payload: newData.data});
+    if (newData?.status === 'OK') {
+      dispatch({type: USER_REDUCER_TYPE.UPDATE_MANY, payload: newData.data});
+    }
   };
   return (
     <UserContext.Provider

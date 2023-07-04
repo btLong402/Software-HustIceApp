@@ -11,9 +11,8 @@ import {setAppAccessToken} from '../services/api';
 
 const initState: AuthState = {
   token: null,
-  isSignout: true,
+  isSignout: null,
   _id: null,
-  isLoading: true,
   mess: null,
 };
 
@@ -26,24 +25,12 @@ export enum AuthActionType {
   SIGN_OUT = 'SIGN_OUT',
   RESTORE_TOKEN = 'RESTORE_TOKEN',
   GET_MESS = 'GET_MESS',
-  IS_LOADING = 'IS_LOADING',
   SIGN_UP = 'SIGN_UP',
-  LOADED = 'LOADED',
 }
 
 export const AuthProvider = ({children}) => {
   const [state, dispatch] = React.useReducer((prevState, action) => {
     switch (action.type) {
-      case 'IS_LOADING':
-        return {
-          ...prevState,
-          isLoading: true,
-        };
-      case 'LOADED':
-        return {
-          ...prevState,
-          isLoading: false,
-        };
       case 'RESTORE_TOKEN':
         return {
           ...prevState,
@@ -89,23 +76,6 @@ export const AuthProvider = ({children}) => {
         };
     }
   }, initState);
-
-  React.useEffect(() => {
-    const bootstrapAsync = async () => {
-      dispatch({type: AuthActionType.IS_LOADING});
-      try {
-        const token = await AsyncStorage.getItem('token');
-        const _id = await AsyncStorage.getItem('_id');
-        dispatch({type: AuthActionType.RESTORE_TOKEN, token, _id});
-        setAppAccessToken(token);
-      } catch (e: any) {
-        dispatch({type: AuthActionType.GET_MESS, mess: 'Error loading app'});
-      } finally {
-        dispatch({type: AuthActionType.LOADED});
-      }
-    };
-    bootstrapAsync();
-  }, []);
 
   const authContext: AuthContextProps = React.useMemo(
     () => ({
@@ -161,7 +131,7 @@ export const AuthProvider = ({children}) => {
   );
 
   return (
-    <AuthContext.Provider value={{...state, ...authContext}}>
+    <AuthContext.Provider value={{...state, dispatch, ...authContext}}>
       {children}
     </AuthContext.Provider>
   );

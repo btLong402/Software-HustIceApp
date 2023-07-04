@@ -1,34 +1,31 @@
-import {Axios, AxiosResponse} from 'axios';
+/* eslint-disable prettier/prettier */
+import axios, {AxiosResponse} from 'axios';
+import {Platform} from 'react-native';
 import Config from 'react-native-config';
 
-export const createClient = (
-  clientApi: Axios,
-  api_root: string,
-  apiConfig = {},
-) => {
+const responseBody = (res: AxiosResponse<any, any>) => res.data;
+
+export const createClient = (api_root: string, apiConfig = {}) => {
   return {
     get: (url: string, config: any = {}) =>
-      clientApi
+      axios
         .get(`${api_root}${url}`, {...config, ...apiConfig})
         .then(responseBody),
     post: (url: string, config: any) =>
-      clientApi
+      axios
         .post(`${api_root}${url}`, {...config, ...apiConfig})
         .then(responseBody),
     del: (url: string, config: any) =>
-      clientApi
+      axios
         .delete(`${api_root}${url}`, {...config, ...apiConfig})
         .then(responseBody),
     put: (url: string, config: any) =>
-      clientApi
+      axios
         .put(`${api_root}${url}`, {...config, ...apiConfig})
         .then(responseBody),
   };
 };
-const responseBody = (res: AxiosResponse<any, any>) => res.data;
 
-// export const nextClient = createClient('');
-
-// export const testClient = createClient(Config.API_URL);
-
-// export const client = createClient('http://localhost:3001/api');
+export const client = createClient(
+  Platform.OS === 'ios' ? Config.API_URL_IOS : Config.API_URL_AND,
+);

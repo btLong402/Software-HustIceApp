@@ -16,7 +16,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Anticons from 'react-native-vector-icons/AntDesign';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
-import {useAuth} from '../context/authContext';
+import {useAuth, AuthActionType} from '../context/authContext';
 import Splash from '../views/SplashScreen';
 import SignIn from '../views/authentication/SignInScreen';
 import SignUp from '../views/authentication/SignUpScreen';
@@ -24,36 +24,161 @@ import CartScreen from '../views/checkout/CartScreen';
 import EditProfileScreen from '../views/profile/EditProfileScreen';
 import CheckoutScreen from '../views/checkout/CheckoutScreen';
 import ProfileScreen from '../views/profile/ProfileScreen';
+import MainPage from '../views/main_page/MainPage';
+import Test from '../views/main_page/Test';
+import Search from '../views/main_page/component/pages/Search';
 
-import AuthStack from './AuthStack';
 import AccountSetting from '../views/AccountSetting';
 import {useUser} from '../context/userContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {setAppAccessToken} from '../services/api';
+
+import {Product, addNewProduct} from '../redux/product/productSlice';
+import {addNewSize} from '../redux/size/sizeSlice';
+import {addNewTopping} from '../redux/topping/toppingSlice';
+import {addNewCategory} from '../redux/category/categorySlice';
+import {
+  getAllProducts,
+  getAllCategory,
+  getAllTopping,
+  getAllSize,
+} from '../services/product-api';
+import {useAppDispatch, useAppSelector} from '../redux/hook';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 function AppNavigation(): JSX.Element {
-  const {isLoading, isSignout, token, _id} = useAuth();
+  const {isSignout, token, _id, dispatch: authDispatch} = useAuth();
+  const {
+    user,
+    getUserInfo,
+    USER_REDUCER_TYPE,
+    dispatch: userDispatch,
+  } = useUser();
+  const products = useAppSelector(state => state.productList);
+  // console.log('user', user);
+  // console.log('token', token);
+  // console.log('_id', _id);
+  // console.log('isSignout', isSignout);
+  // console.log('products', products);
 
-  const {user, getUserInfo, USER_REDUCER_TYPE, dispatch} = useUser();
+  const productDispatch = useAppDispatch();
 
+  const [isLoading, setIsLoading] = React.useState<boolean>(true);
+  // console.log('isLoading', isLoading);
   const getUserInfoStorage = async () => {
-    const data = await AsyncStorage.getItem('user_info');
-    if (data) {
-      const userInfo = JSON.parse(data);
-      const userInfoParse = {...userInfo, dob: new Date(userInfo?.dob)};
-      dispatch({type: USER_REDUCER_TYPE.UPDATE_MANY, payload: userInfoParse});
-      return true;
+    try {
+      const data = await AsyncStorage.getItem('user_info');
+      if (data) {
+        const userInfo = JSON.parse(data);
+        const userInfoParse = {...userInfo, dob: new Date(userInfo?.dob)};
+        userDispatch({
+          type: USER_REDUCER_TYPE.UPDATE_MANY,
+          payload: userInfoParse,
+        });
+        return true;
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      return false;
     }
-    return false;
   };
-  useEffect(() => {
-    if (!_id) return;
-    if (!getUserInfoStorage()) getUserInfo(_id);
-  }, [_id]);
 
-  console.log('user :', user);
+  const loadProductData = () => {
+    Promise.all([
+      getAllProducts(),
+      getAllCategory(),
+      getAllSize(),
+      getAllTopping(),
+    ]).then(responses => {
+      responses[0].data.forEach((product: any) => {
+        let toppingList: any = [];
+        let category: any = [];
+        let size: any = [];
+        product.toppingList.forEach((topping: any) => {
+          toppingList.push({toppingId: String(topping.toppingId)});
+        });
+        product.category.forEach((cate: any) => {
+          category.push({
+            title: String(cate.title),
+          });
+        });
+        product.sizeList.forEach((s: any) => {
+          size.push({
+            sizeId: String(s._id),
+          });
+        });
+        let newProduct: Product = {
+          productId: String(product._id),
+          name: String(product.name),
+          description: '',
+          basePrice: Number(product.basePrice),
+          discount: 0,
+          category: category,
+          sizeList: size,
+          toppingList: toppingList,
+          image: String(product.image),
+        };
+        productDispatch(addNewProduct(newProduct));
+      });
+
+      responses[1].data.forEach((category: any) => {
+        productDispatch(
+          addNewCategory({
+            title: String(category.title),
+            categoryId: String(category._id),
+          }),
+        );
+      });
+
+      responses[2].data.forEach((size: any) => {
+        productDispatch(
+          addNewSize({
+            size: String(size.size),
+            sizeId: String(size._id),
+            price: Number(size.price),
+          }),
+        );
+      });
+      responses[3].data.forEach((topping: any) => {
+        productDispatch(
+          addNewTopping({
+            toppingId: String(topping._id),
+            name: String(topping.name),
+            price: Number(topping.price),
+          }),
+        );
+      });
+      loadAuthInfo();
+    });
+  };
+
+  const loadAuthInfo = async () => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      const _id = await AsyncStorage.getItem('_id');
+      authDispatch({type: AuthActionType.RESTORE_TOKEN, token, _id});
+      token && setAppAccessToken(token);
+    } catch (e: any) {
+      authDispatch({type: AuthActionType.GET_MESS, mess: 'Error loading app'});
+    }
+  };
+
+  useEffect(() => {
+    if (isSignout !== null) return;
+    setIsLoading(true);
+    loadProductData();
+    // loadAuthInfo();
+  }, []);
+
+  useEffect(() => {
+    if (isSignout === null) return;
+    if (!isSignout) if (_id && !getUserInfoStorage()) getUserInfo(_id);
+    setIsLoading(false);
+  }, [_id, isSignout]);
+
   return isLoading ? (
     <Splash />
   ) : (
@@ -68,6 +193,8 @@ function AppNavigation(): JSX.Element {
             />
             <Stack.Screen name="SignIn" component={SignIn} />
             <Stack.Screen name="SignUp" component={SignUp} />
+            <Stack.Screen name="Test" component={Test} />
+            <Stack.Screen name="Search" component={Search} />
           </>
         ) : (
           <>
@@ -76,6 +203,8 @@ function AppNavigation(): JSX.Element {
               component={MainTabs}
               options={{headerShown: false}}
             />
+            <Stack.Screen name="Test" component={Test} />
+            <Stack.Screen name="Search" component={Search} />
             <Stack.Screen name="Cart" component={CartScreen} />
             <Stack.Screen name="EditProfile" component={EditProfileScreen} />
             <Stack.Screen name="Checkout" component={CheckoutScreen} />
@@ -179,7 +308,11 @@ function MainTabs() {
           </Flex>
         ),
       })}>
-      <Tab.Screen name="Home" component={MainScreen} />
+      <Tab.Screen
+        name="Home"
+        component={MainPage}
+        options={{headerShown: false}}
+      />
       <Tab.Screen name="Me" component={MeScreen} />
     </Tab.Navigator>
   );
