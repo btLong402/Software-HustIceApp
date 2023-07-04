@@ -25,7 +25,7 @@ export const config = {
 
 async function reloadApp() {
   await AsyncStorage.removeItem('token');
-  await AsyncStorage.removeItem('username');
+  await AsyncStorage.removeItem('_id');
   // isRefreshing = false;
   // failedQueue = [];
   // force reload app, reset all state
@@ -34,10 +34,9 @@ async function reloadApp() {
 
 const axiosClient = axios.create(config);
 
-const createAuthToken = token => `Bearer ${token}`;
-
 export function setAppAccessToken(token) {
-  axiosClient.defaults.headers.common['TOKEN'] = createAuthToken(token);
+  axiosClient.defaults.headers.common['TOKEN'] = token
+  ;
 }
 
 axiosClient.interceptors.response.use(

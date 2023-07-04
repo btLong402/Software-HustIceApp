@@ -1,4 +1,5 @@
 import {Axios, AxiosResponse} from 'axios';
+import Config from 'react-native-config';
 
 export const createClient = (
   clientApi: Axios,
@@ -28,6 +29,6 @@ const responseBody = (res: AxiosResponse<any, any>) => res.data;
 
 // export const nextClient = createClient('');
 
-// export const testClient = createClient('http://localhost:3001/api');
+// export const testClient = createClient(Config.API_URL);
 
 // export const client = createClient('http://localhost:3001/api');

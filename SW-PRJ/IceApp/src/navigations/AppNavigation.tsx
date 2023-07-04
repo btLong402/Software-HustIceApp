@@ -6,7 +6,7 @@
  * @format
  */
 
-import React from 'react';
+import React, {useEffect} from 'react';
 import MainScreen from '../views/main_page';
 import MeScreen from '../views/profile/MeScreen';
 import {Badge, Box} from 'native-base';
@@ -27,13 +27,33 @@ import ProfileScreen from '../views/profile/ProfileScreen';
 
 import AuthStack from './AuthStack';
 import AccountSetting from '../views/AccountSetting';
+import {useUser} from '../context/userContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 function AppNavigation(): JSX.Element {
-  const {isLoading, isSignout, token, username} = useAuth();
-  console.log(token, username);
+  const {isLoading, isSignout, token, _id} = useAuth();
+
+  const {user, getUserInfo, USER_REDUCER_TYPE, dispatch} = useUser();
+
+  const getUserInfoStorage = async () => {
+    const data = await AsyncStorage.getItem('user_info');
+    if (data) {
+      const userInfo = JSON.parse(data);
+      const userInfoParse = {...userInfo, dob: new Date(userInfo?.dob)};
+      dispatch({type: USER_REDUCER_TYPE.UPDATE_MANY, payload: userInfoParse});
+      return true;
+    }
+    return false;
+  };
+  useEffect(() => {
+    if (!_id) return;
+    if (!getUserInfoStorage()) getUserInfo(_id);
+  }, [_id]);
+
+  console.log('user :', user);
   return isLoading ? (
     <Splash />
   ) : (

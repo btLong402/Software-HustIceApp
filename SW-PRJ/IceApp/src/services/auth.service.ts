@@ -8,17 +8,17 @@ const login = (data: any) => {
   console.log('test: ', axiosClient);
   return axiosClient({
     method: 'POST',
-    url: '/user/login',
+    url: '/users/login',
     data: data,
   })
     .then(async response => {
       console.log('response: ', response.status);
       if (response.status === API_STATUS.SUCCESS) {
-        console.log('response: ', response.headers);
+        console.log('response: ', response);
         if (response.headers['token']) {
           setAppAccessToken(response.data.token);
           await AsyncStorage.setItem('token', response.data.token);
-          await AsyncStorage.setItem('username', response.data.username);
+          await AsyncStorage.setItem('_id', response.data._id);
           return {
             status: 'OK',
             data: response.data,
@@ -44,7 +44,7 @@ const register = (data: any) => {
   return axios
     .create(config)({
       method: 'POST',
-      url: '/user/register',
+      url: '/users/register',
       data: data,
     })
     .then(response => {
@@ -66,8 +66,8 @@ const register = (data: any) => {
 
 const logout = async () => {
   await AsyncStorage.removeItem('token');
-  await AsyncStorage.removeItem('username');
-  // await AsyncStorage.removeItem('refreshToken');
+  await AsyncStorage.removeItem('_id');
+  await AsyncStorage.removeItem('user_info');
 };
 
 export default {

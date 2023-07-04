@@ -12,7 +12,7 @@ import {useUser} from '../../context/userContext';
 
 const EditProfileScreen = ({route, navigation}) => {
   const {dispatch, USER_REDUCER_TYPE} = useUser();
-  const {label, value} = route.params;
+  const {label, value, setData} = route.params;
 
   const [isCanSaved, setIsCanSaved] = useState(false);
 
@@ -26,10 +26,7 @@ const EditProfileScreen = ({route, navigation}) => {
           value={value}
           onChangeSavedDisplay={handleSavedDisplay}
           onChangeFullname={text => {
-            dispatch({
-              type: USER_REDUCER_TYPE.UPDATE_FULLNAME,
-              payload: text,
-            });
+            setData({fullname: text});
           }}
         />
       );
@@ -40,10 +37,7 @@ const EditProfileScreen = ({route, navigation}) => {
           value={value}
           onChangeSavedDisplay={handleSavedDisplay}
           onChangeEmail={text => {
-            dispatch({
-              type: USER_REDUCER_TYPE.UPDATE_EMAIL,
-              payload: text,
-            });
+            setData({email: text});
           }}
         />
       );
@@ -54,10 +48,7 @@ const EditProfileScreen = ({route, navigation}) => {
           value={value}
           onChangeSavedDisplay={handleSavedDisplay}
           onChangePhone={text => {
-            dispatch({
-              type: USER_REDUCER_TYPE.UPDATE_PHONE,
-              payload: text,
-            });
+            setData({phoneNumber: text});
           }}
         />
       );
@@ -68,10 +59,8 @@ const EditProfileScreen = ({route, navigation}) => {
           value={value}
           onChangeSavedDisplay={handleSavedDisplay}
           onChangeGender={selection => {
-            dispatch({
-              type: USER_REDUCER_TYPE.UPDATE_GENDER,
-              payload: selection,
-            });
+            console.log('selection: ', selection);
+            setData({gender: selection});
           }}
         />
       );

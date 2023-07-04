@@ -79,9 +79,24 @@ const BadgeNumber = ({number}) => {
   );
 };
 const Header_Max_Height = 104;
+
+const convertLevel = (level: string) => {
+  switch (level) {
+    case 'bronze':
+      return 'Bronze';
+    case 'silver':
+      return 'Silver';
+    case 'gold':
+      return 'Gold';
+    case 'diamond':
+      return 'Diamond';
+    default:
+      return 'Unknown';
+  }
+};
+
 export default MeScreen = ({navigation}) => {
   const {isSignout} = useAuth();
-  console.log('isSignout: ', isSignout);
   const {user: userProfile} = useUser();
   let scrollOffsetY = useRef(new Animated.Value(0)).current;
   const animateHeaderHeight = scrollOffsetY.interpolate({
@@ -118,15 +133,17 @@ export default MeScreen = ({navigation}) => {
                   marginX={'3'}
                   size="md"
                   source={{
-                    uri: userProfile.avatar.uri,
+                    uri: userProfile.avatar
+                      ? userProfile.avatar.uri
+                      : 'https://anubis.gr/wp-content/uploads/2018/03/no-avatar.png',
                   }}
                   alt="Avatar"
                   borderRadius="full"
                 />
               </TouchableWithoutFeedback>
-              <VStack justifyContent={'start'} space={1}>
+              <VStack justifyContent={'flex-start'} space={1}>
                 <Text fontSize="xl" color="white" fontWeight={'bold'}>
-                  {userProfile.fullname}
+                  {userProfile.fullname ? userProfile.fullname : 'Anonymous'}
                 </Text>
                 <Box alignSelf={'flex-start'}>
                   <LinearGradient
@@ -139,18 +156,20 @@ export default MeScreen = ({navigation}) => {
                       px={2}
                       py={0.5}
                       alignItems="center"
-                      justifyContent="start">
-                      <Text color="#1e2a3b">Silver member</Text>
+                      justifyContent="flex-start">
+                      <Text color="#1e2a3b">
+                        {convertLevel(userProfile.level || '')} member
+                      </Text>
                       <Anticons name={'right'} size={14} color={'#1e2a3b'} />
                     </HStack>
                   </LinearGradient>
                 </Box>
-                <Text color="white">
+                {/* <Text color="white">
                   <Text fontWeight={'bold'} fontSize={'md'}>
                     1000
                   </Text>
                   <Text> points</Text>
-                </Text>
+                </Text> */}
               </VStack>
             </HStack>
           ) : (

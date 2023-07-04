@@ -7,11 +7,12 @@ import {
   RegisterResponse,
   AuthState,
 } from '../utils/types';
+import {setAppAccessToken} from '../services/api';
 
 const initState: AuthState = {
   token: null,
   isSignout: true,
-  username: null,
+  _id: null,
   isLoading: true,
   mess: null,
 };
@@ -46,7 +47,7 @@ export const AuthProvider = ({children}) => {
       case 'RESTORE_TOKEN':
         return {
           ...prevState,
-          username: action.username,
+          _id: action._id,
           token: action.token,
           isSignout: action.token === null,
           mess: null,
@@ -55,7 +56,7 @@ export const AuthProvider = ({children}) => {
         return {
           ...prevState,
           isSignout: false,
-          username: action.username,
+          _id: action._id,
           token: action.token,
           mess: {
             type: 'success',
@@ -66,7 +67,7 @@ export const AuthProvider = ({children}) => {
         return {
           ...prevState,
           isSignout: true,
-          username: null,
+          _id: null,
           token: null,
           mess: null,
         };
@@ -94,8 +95,9 @@ export const AuthProvider = ({children}) => {
       dispatch({type: AuthActionType.IS_LOADING});
       try {
         const token = await AsyncStorage.getItem('token');
-        const username = await AsyncStorage.getItem('username');
-        dispatch({type: AuthActionType.RESTORE_TOKEN, token, username});
+        const _id = await AsyncStorage.getItem('_id');
+        dispatch({type: AuthActionType.RESTORE_TOKEN, token, _id});
+        setAppAccessToken(token);
       } catch (e: any) {
         dispatch({type: AuthActionType.GET_MESS, mess: 'Error loading app'});
       } finally {
@@ -115,7 +117,7 @@ export const AuthProvider = ({children}) => {
             dispatch({
               type: AuthActionType.SIGN_IN,
               token: resData.data.token,
-              username: resData.data.username,
+              _id: resData.data._id,
             });
           } else if (resData.status === 'ERROR') {
             dispatch({

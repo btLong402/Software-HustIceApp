@@ -2,14 +2,14 @@ export interface LoginResponse {
   status: string;
   data: {
     token?: string;
-    username?: string;
+    _id?: string;
     message?: string;
   };
 }
 export interface AuthState {
   token: string | null;
   isSignout: boolean;
-  username: string | null;
+  _id: string | null;
   isLoading: boolean;
   mess: {
     type: string;

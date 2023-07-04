@@ -14,7 +14,7 @@ import {useToast, Box, Text, HStack} from 'native-base';
 import {ImagePickerModal} from './ImagePickerModal';
 import ImagePicker from 'react-native-image-crop-picker';
 import {useUser} from '../../context/userContext';
-
+import {useAuth} from '../../context/authContext';
 export const convertGender = (type: number) => {
   switch (type) {
     case 0:
@@ -29,7 +29,21 @@ export const convertGender = (type: number) => {
 };
 
 const ProfileScreen = ({navigation}) => {
-  const {user: userProfile, dispatch, USER_REDUCER_TYPE} = useUser();
+  const {
+    user: userProfile,
+    dispatch,
+    USER_REDUCER_TYPE,
+    updateUserInfo,
+  } = useUser();
+  const {_id} = useAuth();
+  const [userProfileState, setUserProfileState] = useState(userProfile);
+
+  const setData = data => {
+    setUserProfileState({
+      ...userProfileState,
+      ...data,
+    });
+  };
 
   useLayoutEffect(() => {
     const headerLeft = () => (
@@ -55,24 +69,27 @@ const ProfileScreen = ({navigation}) => {
         letterSpacing: 1, // set the letter spacing to 0.5
       },
       headerRight: () => (
-        <TouchableOpacity>
+        <TouchableOpacity
+          onPress={async () => {
+            if (userProfileState !== userProfile) {
+              await updateUserInfo(_id, userProfileState);
+              navigation.goBack();
+            }
+          }}>
           <Text
             fontWeight={'500'}
             style={{
               marginRight: 10,
               fontSize: 20,
-              opacity: 1,
+              opacity: userProfileState === userProfile ? 0.5 : 1,
               color: 'crimson',
-            }}
-            onPress={() => {
-              navigation.goBack();
             }}>
             Save
           </Text>
         </TouchableOpacity>
       ),
     });
-  }, [navigation]);
+  }, [navigation, userProfileState === userProfile]);
 
   const [visible, setVisible] = useState(false);
   const [openDatePicker, setOpenDatePicker] = useState(false);
@@ -85,10 +102,16 @@ const ProfileScreen = ({navigation}) => {
       cropping: true,
     })
       .then(image => {
+        // console.log({
+        //   uri: image.path,
+        //   type: image.mime,
+        //   name: image.filename,
+        //   size: image.size,
+        // });
         setVisible(false);
-        dispatch({
-          type: USER_REDUCER_TYPE.UPDATE_AVATAR,
-          payload: {
+        setUserProfileState({
+          ...userProfileState,
+          avatar: {
             uri: image.path,
             type: image.mime,
             name: image.filename,
@@ -132,13 +155,12 @@ const ProfileScreen = ({navigation}) => {
   };
 
   const handleClickChangeType = (label, value) => {
-    if (
-      label === 'Fullname' ||
-      label === 'Email' ||
-      label === 'Phone' ||
-      label === 'Gender'
-    ) {
-      navigation.navigate('EditProfile', {label, value});
+    if (label === 'Fullname' || label === 'Email' || label === 'Phone') {
+      value = value.includes('Enter') ? '' : value;
+
+      navigation.navigate('EditProfile', {label, value, setData});
+    } else if (label === 'Gender') {
+      navigation.navigate('EditProfile', {label, value, setData});
     } else if (label === 'Date of Birth') {
       setOpenDatePicker(true);
     } else if (label === 'Association Account') {
@@ -164,7 +186,9 @@ const ProfileScreen = ({navigation}) => {
               <Image
                 style={styles.avatar}
                 source={{
-                  uri: userProfile.avatar.uri,
+                  uri: userProfileState.avatar
+                    ? userProfileState.avatar.uri
+                    : 'https://anubis.gr/wp-content/uploads/2018/03/no-avatar.png',
                 }}
               />
             </TouchableWithoutFeedback>
@@ -187,31 +211,47 @@ const ProfileScreen = ({navigation}) => {
           <View>
             <ProfileRow
               label="Fullname"
-              value={userProfile.fullname}
+              value={
+                userProfileState.fullname
+                  ? userProfileState.fullname
+                  : 'Enter fullname'
+              }
               navigation={navigation}
               onClick={handleClickChangeType}
             />
             <ProfileRow
               label="Email"
-              value={userProfile.email}
+              value={
+                userProfileState.email ? userProfileState.email : 'Enter email'
+              }
               navigation={navigation}
               onClick={handleClickChangeType}
             />
             <ProfileRow
               label="Phone"
-              value={userProfile.phone}
+              value={
+                userProfileState.phoneNumber
+                  ? userProfileState.phoneNumber
+                  : 'Enter phone'
+              }
               navigation={navigation}
               onClick={handleClickChangeType}
             />
             <ProfileRow
               label="Gender"
-              value={userProfile.gender}
+              value={
+                userProfileState.gender !== null ? userProfileState.gender : -1
+              }
               navigation={navigation}
               onClick={handleClickChangeType}
             />
             <ProfileRow
               label="Date of Birth"
-              value={userProfile.dob}
+              value={
+                userProfileState.dob
+                  ? userProfileState.dob
+                  : 'Enter date of birth'
+              }
               onClick={handleClickChangeType}
             />
             <ProfileRow
@@ -227,15 +267,20 @@ const ProfileScreen = ({navigation}) => {
         modal
         mode="date"
         open={openDatePicker}
-        date={userProfile.dob}
-        key={userProfile.dob.toISOString()}
+        date={
+          userProfileState.dob && userProfileState.dob instanceof Date
+            ? userProfileState.dob
+            : new Date()
+        }
+        key={
+          userProfileState.dob && userProfileState.dob instanceof Date
+            ? userProfileState.dob.toISOString()
+            : new Date().toISOString()
+        }
         display={'compact'}
         onConfirm={date => {
           setOpenDatePicker(false);
-          dispatch({
-            type: USER_REDUCER_TYPE.UPDATE_DOB,
-            payload: date,
-          });
+          setData({dob: date});
         }}
         onCancel={() => {
           setOpenDatePicker(false);
@@ -254,8 +299,9 @@ const ProfileScreen = ({navigation}) => {
 const ProfileRow = ({label, value, onClick}) => {
   let valueText = value;
   if (label === 'Date of Birth') {
-    valueText = valueText.toLocaleDateString();
+    if (valueText instanceof Date) valueText = valueText.toLocaleDateString();
   } else if (label === 'Gender') {
+    console.log('value: ', value);
     valueText = convertGender(value);
   }
   const handlePress = () => {
