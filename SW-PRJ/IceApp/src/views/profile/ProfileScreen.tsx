@@ -70,6 +70,7 @@ const ProfileScreen = ({route, navigation}) => {
             if (userProfileState !== userProfile) {
               // console.log('userProfileState Save: ', userProfileRef.current);
               await updateUserInfo(_id, userProfileRef.current);
+              update_mess(null);
               navigation.goBack();
             }
           }}>

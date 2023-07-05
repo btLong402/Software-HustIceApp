@@ -56,14 +56,15 @@ function MainPage({navigation}: any) {
   const {categoryList} = useAppSelector(state => state.categoryList);
   const {productList} = useAppSelector(state => state.productList);
   useEffect(() => {
-    if (!ref1.current) return;
+    if (!ref1.current || !productList || !categoryList) return;
     ref1.current?.scrollToIndex({
       index: i,
       animated: true,
       viewPosition: 0,
     });
   }, [i]);
-  const Data: DataSection[] = getData(productList, categoryList);
+  const Data: DataSection[] =
+    productList && categoryList ? getData(productList, categoryList) : [];
   // console.log('🚀 ~ file: MainPage.tsx:66 ~ MainPage ~ Data:', Data[0].title, Data[0].products);
   const handleClick = () => {
     navigation.navigate('Test');

@@ -8,11 +8,11 @@ export interface Category {
 }
 
 export interface CategoryList {
-  categoryList: Category[];
+  categoryList: Category[] | null;
 }
 
 const initialState: CategoryList = {
-  categoryList: [],
+  categoryList: null,
 };
 
 export const categorySlice = createSlice({
@@ -20,6 +20,9 @@ export const categorySlice = createSlice({
   initialState: initialState,
   reducers: {
     addNewCategory: (state, action: PayloadAction<Category>) => {
+      if (state.categoryList === null) {
+        state.categoryList = [];
+      }
       state.categoryList.push(action.payload);
     },
   },

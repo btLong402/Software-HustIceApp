@@ -113,13 +113,8 @@ export const UserProvider = ({children}: UserProviderProps) => {
 
   const getUserInfo = async (_id: string) => {
     const data = await UserService.getProfile(_id);
-
     if (data?.status === 'OK') {
-      const userInfo = {
-        ...data?.data,
-        dob: data?.data?.dob ? new Date(data?.data?.dob) : null,
-      };
-      dispatch({type: USER_REDUCER_TYPE.UPDATE_MANY, payload: userInfo});
+      dispatch({type: USER_REDUCER_TYPE.UPDATE_MANY, payload: data?.data});
     }
   };
 

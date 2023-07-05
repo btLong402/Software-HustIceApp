@@ -9,15 +9,18 @@ const getProfile = async id => {
     url: `/users/${id}`,
   })
     .then(async response => {
-      console.log('response: ', response.data.data);
       if (response.status === API_STATUS.SUCCESS) {
-        await AsyncStorage.setItem(
-          'user_info',
-          JSON.stringify(response.data.data),
-        );
+        const resData = JSON.parse(JSON.stringify(response.data.data));
+        // delete resData._id;
+        resData.dob = resData.dob ? new Date(resData.dob) : null;
+        resData.avatar = {
+          uri: resData.avatarPath,
+        };
+        delete resData.avatarPath;
+        await AsyncStorage.setItem('user_info', JSON.stringify(resData));
         return {
           status: 'OK',
-          data: response.data.data,
+          data: resData,
         };
       }
     })
@@ -61,6 +64,7 @@ const updateProfile = async (id, data) => {
           uri: resData.avatarPath,
         };
         delete resData.avatarPath;
+        console.log('resData: ', resData);
         await AsyncStorage.setItem('user_info', JSON.stringify(resData));
         return {
           status: 'OK',

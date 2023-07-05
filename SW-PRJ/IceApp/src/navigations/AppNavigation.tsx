@@ -57,11 +57,11 @@ function AppNavigation(): JSX.Element {
     dispatch: userDispatch,
   } = useUser();
   const products = useAppSelector(state => state.productList);
-  // console.log('user', user);
+  console.log('user', user);
   // console.log('token', token);
   // console.log('_id', _id);
-  // console.log('isSignout', isSignout);
-  // console.log('products', products);
+  console.log('isSignout', isSignout);
+  console.log('products', products);
 
   const productDispatch = useAppDispatch();
 
@@ -176,7 +176,7 @@ function AppNavigation(): JSX.Element {
   }, []);
 
   useEffect(() => {
-    if (isSignout === null) return;
+    if (isSignout === null || !_id) return;
     const loadUserInfo = async () => {
       if (!isSignout) {
         const isHaveUserInfo = await getUserInfoStorage();
