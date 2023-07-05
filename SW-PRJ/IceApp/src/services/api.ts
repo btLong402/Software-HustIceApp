@@ -5,7 +5,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {API_STATUS} from '../utils/constants';
 import {Platform} from 'react-native';
 
-console.log('Config.API_URL_IOS: ', Config.API_URL_IOS);
 export const config = {
   baseURL: Platform.OS === 'ios' ? Config.API_URL_IOS : Config.API_URL_AND,
   validateStatus: status => status >= 200 && status < 400,

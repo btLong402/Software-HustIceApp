@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import React from 'react';
+import React, {useEffect} from 'react';
 import {
   View,
   Text,
@@ -16,10 +16,7 @@ import {ScrollView, useToast, Box} from 'native-base';
 import {useAuth} from '../../context/authContext';
 import authService from '../../services/auth.service';
 
-const handlePress = () => {
-  console.log('Forgot password pressed');
-  // Add your forgot password logic here
-};
+
 
 const phoneRegex =
   '^(0|84)(2(0[3-9]|1[0-6|8|9]|2[0-2|5-9]|3[2-9]|4[0-9]|5[1|2|4-9]|6[0-3|9]|7[0-7]|8[0-9]|9[0-4|6|7|9])|3[2-9]|5[5|6|8|9]|7[0|6-9]|8[0-6|8|9]|9[0-4|6-9])([0-9]{7})$';
@@ -48,7 +45,7 @@ const signUpValidationSchema = yup.object().shape({
 const SignUp = ({navigation}) => {
   const toast = useToast();
 
-  const {signUp, mess} = useAuth();
+  const {signUp, mess, setMess} = useAuth();
   let isOpen = false;
   useLayoutEffect(() => {
     const headerLeft = () => (
@@ -76,6 +73,29 @@ const SignUp = ({navigation}) => {
       },
     });
   }, [navigation]);
+
+  useEffect(() => {
+    if (mess?.type) {
+      toast.show({
+        placement: 'top',
+        render: () => {
+          return (
+            <Box
+              px="2"
+              py="1"
+              rounded="sm"
+              mb={5}
+              bgColor={mess.type === 'success' ? 'green.500' : 'red.200'}>
+              {mess.message}
+            </Box>
+          );
+        },
+      });
+      mess?.type === 'success' && setTimeout(() => navigation.goBack(), 1000);
+      setMess(null);
+    }
+  }, [mess]);
+
   const scrollViewRef = useRef();
   const handleSubmit = async () => {
     await authService.register({});
@@ -106,37 +126,8 @@ const SignUp = ({navigation}) => {
             const {password, phoneNumber, username} = values;
             try {
               await signUp({username, password, phoneNumber});
-              if (mess?.type) {
-                toast.show({
-                  placement: 'top',
-                  render: () => {
-                    return (
-                      <Box
-                        px="2"
-                        py="1"
-                        rounded="sm"
-                        mb={5}
-                        bgColor={
-                          mess.type === 'success' ? 'green.500' : 'red.200'
-                        }>
-                        {mess.message}
-                      </Box>
-                    );
-                  },
-                });
-                mess.type === 'success' && navigation.goBack();
-              }
             } catch (error) {
-              toast.show({
-                placement: 'top',
-                render: () => {
-                  return (
-                    <Box px="2" py="1" rounded="sm" mb={5} bgColor={'red.200'}>
-                      {error.message}
-                    </Box>
-                  );
-                },
-              });
+              setMess({type: 'error', message: error.message});
             }
           }}>
           {({
@@ -234,18 +225,6 @@ const SignUp = ({navigation}) => {
             </>
           )}
         </Formik>
-        <TouchableOpacity style={styles.sign_up_btn} onPress={handleSubmit}>
-          <Text style={styles.h1}>Never Hungry Again!</Text>
-        </TouchableOpacity>
-        {/* <Text style={styles.h3}>or Sign Up with</Text>
-        <View style={styles.social_sign_up}>
-          <TouchableOpacity style={styles.social_btn} onPress={handlePress}>
-            <Image source={require('../../assets/images/Facebook.png')} />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.social_btn} onPress={handlePress}>
-            <Image source={require('../../assets/images/Google.png')} />
-          </TouchableOpacity>
-        </View> */}
       </View>
     </ScrollView>
   );

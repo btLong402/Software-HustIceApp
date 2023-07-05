@@ -5,16 +5,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {API_STATUS} from '../utils/constants';
 
 const login = (data: any) => {
-  console.log('test: ', axiosClient);
   return axiosClient({
     method: 'POST',
     url: '/users/login',
     data: data,
   })
     .then(async response => {
-      console.log('response: ', response.status);
       if (response.status === API_STATUS.SUCCESS) {
-        console.log('response: ', response);
         if (response.headers['token']) {
           setAppAccessToken(response.data.token);
           await AsyncStorage.setItem('token', response.data.token);
@@ -48,7 +45,7 @@ const register = (data: any) => {
       data: data,
     })
     .then(response => {
-      console.log('response: ', response.status);
+      // console.log('response: ', response.status);
       if (response.status === API_STATUS.SUCCESS) {
         return {
           status: 'OK',

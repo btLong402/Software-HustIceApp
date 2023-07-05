@@ -26,12 +26,18 @@ export enum AuthActionType {
   RESTORE_TOKEN = 'RESTORE_TOKEN',
   GET_MESS = 'GET_MESS',
   SIGN_UP = 'SIGN_UP',
+  SET_MESS = 'SET_MESS',
 }
 
 export const AuthProvider = ({children}) => {
   const [state, dispatch] = React.useReducer((prevState, action) => {
     switch (action.type) {
-      case 'RESTORE_TOKEN':
+      case AuthActionType.SET_MESS:
+        return {
+          ...prevState,
+          mess: action.mess,
+        };
+      case AuthActionType.RESTORE_TOKEN:
         return {
           ...prevState,
           _id: action._id,
@@ -39,7 +45,7 @@ export const AuthProvider = ({children}) => {
           isSignout: action.token === null,
           mess: null,
         };
-      case 'SIGN_IN':
+      case AuthActionType.SIGN_IN:
         return {
           ...prevState,
           isSignout: false,
@@ -50,7 +56,7 @@ export const AuthProvider = ({children}) => {
             message: 'Login successfully',
           },
         };
-      case 'SIGN_OUT':
+      case AuthActionType.SIGN_OUT:
         return {
           ...prevState,
           isSignout: true,
@@ -58,7 +64,7 @@ export const AuthProvider = ({children}) => {
           token: null,
           mess: null,
         };
-      case 'SIGN_UP':
+      case AuthActionType.SIGN_UP:
         return {
           ...prevState,
           mess: {
@@ -66,23 +72,20 @@ export const AuthProvider = ({children}) => {
             message: 'Register successfully',
           },
         };
-      case 'GET_MESS':
-        return {
-          ...prevState,
-          mess: {
-            type: 'error',
-            message: action.mess,
-          },
-        };
     }
   }, initState);
 
   const authContext: AuthContextProps = React.useMemo(
     () => ({
+      setMess: mess => {
+        dispatch({
+          type: AuthActionType.SET_MESS,
+          mess,
+        });
+      },
       signIn: async data => {
         try {
           const resData: LoginResponse = await AuthService.login(data);
-          console.log(resData);
           if (resData.status === 'OK') {
             dispatch({
               type: AuthActionType.SIGN_IN,
@@ -91,14 +94,20 @@ export const AuthProvider = ({children}) => {
             });
           } else if (resData.status === 'ERROR') {
             dispatch({
-              type: AuthActionType.GET_MESS,
-              mess: resData.data.message,
+              type: AuthActionType.SET_MESS,
+              mess: {
+                type: 'error',
+                message: resData.data,
+              },
             });
           }
         } catch (e) {
           dispatch({
-            type: AuthActionType.GET_MESS,
-            mess: e.message,
+            type: AuthActionType.SET_MESS,
+            mess: {
+              type: 'error',
+              message: e.message,
+            },
           });
         }
       },
@@ -115,14 +124,20 @@ export const AuthProvider = ({children}) => {
             });
           } else if (resData.status === 'ERROR') {
             dispatch({
-              type: AuthActionType.GET_MESS,
-              mess: resData.data,
+              type: AuthActionType.SET_MESS,
+              mess: {
+                type: 'error',
+                message: resData.data,
+              },
             });
           }
         } catch (e) {
           dispatch({
             type: AuthActionType.GET_MESS,
-            mess: e.message,
+            mess: {
+              type: 'error',
+              message: e.message,
+            },
           });
         }
       },

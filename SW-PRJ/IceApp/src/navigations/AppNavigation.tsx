@@ -151,7 +151,6 @@ function AppNavigation(): JSX.Element {
           }),
         );
       });
-      loadAuthInfo();
     });
   };
 
@@ -168,15 +167,26 @@ function AppNavigation(): JSX.Element {
 
   useEffect(() => {
     if (isSignout !== null) return;
+    const initLoad = async () => {
+      await loadProductData();
+      await loadAuthInfo();
+    };
     setIsLoading(true);
-    loadProductData();
-    // loadAuthInfo();
+    initLoad();
   }, []);
 
   useEffect(() => {
     if (isSignout === null) return;
-    if (!isSignout) if (_id && !getUserInfoStorage()) getUserInfo(_id);
-    setIsLoading(false);
+    const loadUserInfo = async () => {
+      if (!isSignout) {
+        const isHaveUserInfo = await getUserInfoStorage();
+        if (!isHaveUserInfo) {
+          await getUserInfo(_id);
+        }
+      }
+      setIsLoading(false);
+    };
+    loadUserInfo();
   }, [_id, isSignout]);
 
   return isLoading ? (

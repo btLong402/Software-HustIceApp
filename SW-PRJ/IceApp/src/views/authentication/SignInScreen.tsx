@@ -17,10 +17,7 @@ import {useAuth} from '../../context/authContext';
 import AntIcon from 'react-native-vector-icons/AntDesign';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useLayoutEffect} from 'react';
-const handlePress = () => {
-  console.log('Forgot password pressed');
-  // Add your forgot password logic here
-};
+
 const phoneRegex =
   '^(0|84)(2(0[3-9]|1[0-6|8|9]|2[0-2|5-9]|3[2-9]|4[0-9]|5[1|2|4-9]|6[0-3|9]|7[0-7]|8[0-9]|9[0-4|6|7|9])|3[2-9]|5[5|6|8|9]|7[0|6-9]|8[0-6|8|9]|9[0-4|6-9])([0-9]{7})$';
 
@@ -37,7 +34,7 @@ const loginValidationSchema = yup.object().shape({
 const SignIn = ({navigation}) => {
   const toast = useToast();
 
-  const {signIn, mess} = useAuth();
+  const {signIn, mess, setMess} = useAuth();
   useLayoutEffect(() => {
     const headerLeft = () => (
       <Ionicons
@@ -65,6 +62,28 @@ const SignIn = ({navigation}) => {
     });
   }, [navigation]);
 
+  useEffect(() => {
+    if (mess?.type) {
+      toast.show({
+        placement: 'top',
+        render: () => {
+          return (
+            <Box
+              px="2"
+              py="1"
+              rounded="sm"
+              mb={5}
+              bgColor={mess.type === 'success' ? 'green.500' : 'red.200'}>
+              {mess.message}
+            </Box>
+          );
+        },
+      });
+      mess?.type === 'success' && setTimeout(() => navigation.goBack(), 0);
+      setMess(null);
+    }
+  }, [mess]);
+
   return (
     <View style={styles.container}>
       {/* <ScrollView> */}
@@ -79,37 +98,8 @@ const SignIn = ({navigation}) => {
           onSubmit={async values => {
             try {
               await signIn({...values});
-              if (mess?.type) {
-                toast.show({
-                  placement: 'top',
-                  render: () => {
-                    return (
-                      <Box
-                        px="2"
-                        py="1"
-                        rounded="sm"
-                        mb={5}
-                        bgColor={
-                          mess.type === 'success' ? 'green.500' : 'red.200'
-                        }>
-                        {mess.message}
-                      </Box>
-                    );
-                  },
-                });
-                mess.type === 'success' && navigation.goBack();
-              }
             } catch (error) {
-              toast.show({
-                placement: 'top',
-                render: () => {
-                  return (
-                    <Box px="2" py="1" rounded="sm" mb={5} bgColor={'red.200'}>
-                      {error.message}
-                    </Box>
-                  );
-                },
-              });
+              setMess({type: 'error', message: error.message});
             }
           }}>
           {({

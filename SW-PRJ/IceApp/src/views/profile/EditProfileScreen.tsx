@@ -11,14 +11,13 @@ import {TouchableNativeFeedback, TouchableHighlight} from 'react-native';
 import {useUser} from '../../context/userContext';
 
 const EditProfileScreen = ({route, navigation}) => {
-  const {dispatch, USER_REDUCER_TYPE} = useUser();
-  const {label, value, setData} = route.params;
+  const {label, value, previousScreen} = route.params;
 
   const [isCanSaved, setIsCanSaved] = useState(false);
-
+  const [data, setLocalData] = useState({});
   const handleSavedDisplay = value => setIsCanSaved(value);
-
   let editScreen;
+
   switch (label) {
     case 'Fullname':
       editScreen = (
@@ -26,7 +25,7 @@ const EditProfileScreen = ({route, navigation}) => {
           value={value}
           onChangeSavedDisplay={handleSavedDisplay}
           onChangeFullname={text => {
-            setData({fullname: text});
+            setLocalData({fullname: text});
           }}
         />
       );
@@ -37,7 +36,7 @@ const EditProfileScreen = ({route, navigation}) => {
           value={value}
           onChangeSavedDisplay={handleSavedDisplay}
           onChangeEmail={text => {
-            setData({email: text});
+            setLocalData({email: text});
           }}
         />
       );
@@ -48,7 +47,7 @@ const EditProfileScreen = ({route, navigation}) => {
           value={value}
           onChangeSavedDisplay={handleSavedDisplay}
           onChangePhone={text => {
-            setData({phoneNumber: text});
+            setLocalData({phoneNumber: text});
           }}
         />
       );
@@ -59,8 +58,7 @@ const EditProfileScreen = ({route, navigation}) => {
           value={value}
           onChangeSavedDisplay={handleSavedDisplay}
           onChangeGender={selection => {
-            console.log('selection: ', selection);
-            setData({gender: selection});
+            setLocalData({gender: selection});
           }}
         />
       );
@@ -97,12 +95,12 @@ const EditProfileScreen = ({route, navigation}) => {
           color="crimson"
           style={{marginRight: 10, opacity: isCanSaved ? 1 : 0.5}}
           onPress={() => {
-            isCanSaved && navigation.goBack();
+            isCanSaved && navigation.navigate(previousScreen, {data});
           }}
         />
       ),
     });
-  }, [navigation, isCanSaved]);
+  }, [navigation, isCanSaved, data]);
 
   return (
     <View style={styles.container}>
@@ -147,7 +145,6 @@ const FullnameEditScreen = ({
 
 const GenderEditScreen = ({value, onChangeSavedDisplay, onChangeGender}) => {
   const [gender, setGender] = useState(value);
-  console.log('gender: ', gender);
   useLayoutEffect(() => {
     if (gender === value) {
       onChangeSavedDisplay(false);
@@ -190,7 +187,7 @@ const EmailEditScreen = ({value, onChangeSavedDisplay, onChangeEmail}) => {
     setEmail(text);
   };
   useLayoutEffect(() => {
-    const regexEmail = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/g;
+    const regexEmail = /^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$/g;
     if (!regexEmail.test(email) || email === value || email.length === 0) {
       onChangeSavedDisplay(false);
     } else {

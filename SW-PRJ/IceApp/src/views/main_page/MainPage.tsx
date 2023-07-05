@@ -51,12 +51,12 @@ const RenderItem = (props: RenderItemProps) => {
   );
 };
 function MainPage({navigation}: any) {
-  console.log('test main page');
   const ref1 = useRef<FlatList>(null);
   const [i, setI] = useState(0);
   const {categoryList} = useAppSelector(state => state.categoryList);
   const {productList} = useAppSelector(state => state.productList);
   useEffect(() => {
+    if (!ref1.current) return;
     ref1.current?.scrollToIndex({
       index: i,
       animated: true,
