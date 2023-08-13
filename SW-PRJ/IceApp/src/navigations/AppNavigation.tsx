@@ -58,6 +58,7 @@ function AppNavigation(): JSX.Element {
   } = useUser();
   const products = useAppSelector(state => state.productList);
   console.log('user', user);
+
   // console.log('token', token);
   // console.log('_id', _id);
   console.log('isSignout', isSignout);
@@ -93,6 +94,7 @@ function AppNavigation(): JSX.Element {
       getAllSize(),
       getAllTopping(),
     ]).then(responses => {
+      console.log('responses', responses);
       responses[0].data.forEach((product: any) => {
         let toppingList: any = [];
         let category: any = [];
