@@ -16,7 +16,7 @@ import {
   TextInput,
 } from 'react-native';
 
-import Section from './component/Section';
+import Section from './component/pages/Section';
 
 interface Data {
   id: number;

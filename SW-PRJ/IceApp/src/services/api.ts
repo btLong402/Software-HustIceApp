@@ -38,7 +38,7 @@ async function reloadApp() {
 
 const axiosClient = axios.create(config);
 
-export function setAppAccessToken(token) {
+export function setAppAccessToken(token:any) {
   axiosClient.defaults.headers.common['TOKEN'] = token;
 }
 
