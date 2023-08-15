@@ -44,6 +44,8 @@ import {
   getAllSize,
 } from '../services/product-api';
 import {useAppDispatch, useAppSelector} from '../redux/hook';
+import {delay} from '@reduxjs/toolkit/dist/utils';
+import { TurboModuleRegistry } from 'react-native';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -93,92 +95,108 @@ function AppNavigation(): JSX.Element {
       getAllCategory(),
       getAllSize(),
       getAllTopping(),
-    ]).then(responses => {
-      console.log('responses', responses);
-      responses[0].data.forEach((product: any) => {
-        let toppingList: any = [];
-        let category: any = [];
-        let size: any = [];
-        product.toppingList.forEach((topping: any) => {
-          toppingList.push({toppingId: String(topping.toppingId)});
-        });
-        product.category.forEach((cate: any) => {
-          category.push({
-            title: String(cate.title),
+    ])
+      .then(responses => {
+        console.log('responses', responses);
+        responses[0]?.data.forEach((product: any) => {
+          let toppingList: any = [];
+          let category: any = [];
+          let size: any = [];
+          product.toppingList.forEach((topping: any) => {
+            toppingList.push({toppingId: String(topping.toppingId)});
           });
-        });
-        product.sizeList.forEach((s: any) => {
-          size.push({
-            sizeId: String(s._id),
+          product.category.forEach((cate: any) => {
+            category.push({
+              title: String(cate.title),
+            });
           });
+          product.sizeList.forEach((s: any) => {
+            size.push({
+              sizeId: String(s._id),
+            });
+          });
+          let newProduct: Product = {
+            productId: String(product._id),
+            name: String(product.name),
+            description: '',
+            basePrice: Number(product.basePrice),
+            discount: 0,
+            category: category,
+            sizeList: size,
+            toppingList: toppingList,
+            image: String(product.image),
+          };
+          productDispatch(addNewProduct(newProduct));
         });
-        let newProduct: Product = {
-          productId: String(product._id),
-          name: String(product.name),
-          description: '',
-          basePrice: Number(product.basePrice),
-          discount: 0,
-          category: category,
-          sizeList: size,
-          toppingList: toppingList,
-          image: String(product.image),
-        };
-        productDispatch(addNewProduct(newProduct));
-      });
 
-      responses[1].data.forEach((category: any) => {
-        productDispatch(
-          addNewCategory({
-            title: String(category.title),
-            categoryId: String(category._id),
-          }),
-        );
-      });
+        responses[1]?.data.forEach((category: any) => {
+          productDispatch(
+            addNewCategory({
+              title: String(category.title),
+              categoryId: String(category._id),
+            }),
+          );
+        });
 
-      responses[2].data.forEach((size: any) => {
-        productDispatch(
-          addNewSize({
-            size: String(size.size),
-            sizeId: String(size._id),
-            price: Number(size.price),
-          }),
-        );
+        responses[2]?.data.forEach((size: any) => {
+          productDispatch(
+            addNewSize({
+              size: String(size.size),
+              sizeId: String(size._id),
+              price: Number(size.price),
+            }),
+          );
+        });
+        responses[3]?.data.forEach((topping: any) => {
+          productDispatch(
+            addNewTopping({
+              toppingId: String(topping._id),
+              name: String(topping.name),
+              price: Number(topping.price),
+            }),
+          );
+        });
+      })
+      .catch(error => {
+        console.log(error);
       });
-      responses[3].data.forEach((topping: any) => {
-        productDispatch(
-          addNewTopping({
-            toppingId: String(topping._id),
-            name: String(topping.name),
-            price: Number(topping.price),
-          }),
-        );
-      });
-    });
+  };
+
+  const loadUserInfo = async (_id: string) => {
+    const isHaveUserInfo = await getUserInfoStorage();
+    if (!isHaveUserInfo) {
+      await getUserInfo(_id);
+    }
   };
 
   const loadAuthInfo = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
       const _id = await AsyncStorage.getItem('_id');
-      authDispatch({type: AuthActionType.RESTORE_TOKEN, token, _id});
       token && setAppAccessToken(token);
+      authDispatch({type: AuthActionType.RESTORE_TOKEN, token, _id});
     } catch (e: any) {
       authDispatch({type: AuthActionType.GET_MESS, mess: 'Error loading app'});
     }
   };
 
+  const delay = (ms: number, resolve: (value?: unknown) => void) =>
+    new Promise(resolve => setTimeout(resolve, ms));
+
   useEffect(() => {
     if (isSignout !== null) return;
     const initLoad = async () => {
-      await loadProductData();
+      setIsLoading(true);
       await loadAuthInfo();
+      await loadProductData();
+      setIsLoading(false);
     };
-    setIsLoading(true);
     initLoad();
+    
   }, []);
 
   useEffect(() => {
-    if (isSignout === null || !_id) return;
+    if (isSignout !== false || !_id) return;
     const loadUserInfo = async () => {
       if (!isSignout) {
         const isHaveUserInfo = await getUserInfoStorage();
@@ -186,7 +204,6 @@ function AppNavigation(): JSX.Element {
           await getUserInfo(_id);
         }
       }
-      setIsLoading(false);
     };
     loadUserInfo();
   }, [_id, isSignout]);

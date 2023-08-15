@@ -23,6 +23,7 @@ import Anticons from 'react-native-vector-icons/AntDesign';
 import LinearGradient from 'react-native-linear-gradient';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 // import {TouchableOpacity} from 'react-native-gesture-handler';
+import RNRestart from 'react-native-restart'; // Import package from node modules
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useUser} from '../../context/userContext';
 import {useAuth} from '../../context/authContext';
@@ -133,7 +134,7 @@ export default MeScreen = ({navigation}) => {
                   marginX={'3'}
                   size="md"
                   source={{
-                    uri: userProfile.avatar
+                    uri: userProfile.avatar && userProfile.avatar.uri 
                       ? userProfile.avatar.uri
                       : 'https://anubis.gr/wp-content/uploads/2018/03/no-avatar.png',
                   }}
@@ -181,7 +182,8 @@ export default MeScreen = ({navigation}) => {
               paddingRight={'3'}
               space={3}>
               <TouchableWithoutFeedback
-                onPress={() => navigation.navigate('SignIn')}>
+                onPress={() => navigation.navigate('SignIn')}
+                >
                 <Box
                   bgColor="white"
                   paddingX={2}

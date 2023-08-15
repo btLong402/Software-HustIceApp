@@ -4,7 +4,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // import {TOKEN} from '../utils/constants';
 import {API_STATUS} from '../utils/constants';
 import {Platform} from 'react-native';
-
+import RNRestart from 'react-native-restart'; // Import package from node modules
+ 
 export const config = {
   baseURL: Platform.OS === 'ios' ? Config.API_URL_IOS : Config.API_URL_AND,
   validateStatus: status => status >= 200 && status < 400,
@@ -27,6 +28,8 @@ export const config = {
 async function reloadApp() {
   await AsyncStorage.removeItem('token');
   await AsyncStorage.removeItem('_id');
+  await AsyncStorage.removeItem('user_info');
+  RNRestart.restart();
   // isRefreshing = false;
   // failedQueue = [];
   // force reload app, reset all state
@@ -42,7 +45,7 @@ export function setAppAccessToken(token) {
 axiosClient.interceptors.response.use(
   response => response,
   async error => {
-    const {config: originalRequest, response} = error;
+    const {response} = error;
 
     if (response.status === API_STATUS.UNAUTHORIZED) {
       await reloadApp();
@@ -51,6 +54,7 @@ axiosClient.interceptors.response.use(
     }
   },
 );
+
 // const refreshAccessToken = refreshToken => {
 //   return axios({
 //     method: 'POST',
@@ -59,66 +63,71 @@ axiosClient.interceptors.response.use(
 //   });
 // };
 
-// axiosClient.interceptors.response.use(
-//   response => response,
-//   async error => {
-//     const {config: originalRequest, response} = error;
+axiosClient.interceptors.response.use(
+  response => response,
+  async error => {
+    const {response} = error;
 
-//     // EX: Handle 401 error
-//     if (response?.status === API_STATUS.UNAUTHORIZED) {
-//       const reToken = await AsyncStorage.getItem(TOKEN.REFRESHTOKEN);
+    if (response.status === API_STATUS.UNAUTHORIZED) {
+      await reloadApp();
+    }
+  },
+);
+// EX: Handle 401 error
+//   if (response?.status === API_STATUS.UNAUTHORIZED) {
+//     const reToken = await AsyncStorage.getItem(TOKEN.REFRESHTOKEN);
 
-//       // EX: Check if token is expired
-//       if (!reToken) {
+//     // EX: Check if token is expired
+//     if (!reToken) {
+//       reloadApp();
+//       return Promise.reject(error);
+//     }
+
+//     // EX: Check if token is refreshing
+//     if (!isRefreshing) {
+//       isRefreshing = true;
+
+//       try {
+//         const refreshResponse = await refreshAccessToken(reToken);
+
+//         const {newAccessToken, newRefreshToken} = refreshResponse.data;
+
+//         await SecureStore.setItemAsync(TOKEN.ACCESSTOKEN, newAccessToken);
+//         await SecureStore.setItemAsync(TOKEN.REFRESHTOKEN, newRefreshToken);
+
+//         isRefreshing = false;
+
+//         setAppAccessToken(newAccessToken);
+
+//         // EX: Add callback to failedQueue for retry request and process it
+//         return new Promise(resolve => {
+//           addFailedQueue(newToken => {
+//             originalRequest.headers.Authorization = createAuthToken(newToken);
+
+//             resolve(axiosClient(originalRequest));
+//           });
+
+//           processFailedQueue(newAccessToken);
+//         });
+//       } catch (_e) {
 //         reloadApp();
 //         return Promise.reject(error);
 //       }
-
-//       // EX: Check if token is refreshing
-//       if (!isRefreshing) {
-//         isRefreshing = true;
-
-//         try {
-//           const refreshResponse = await refreshAccessToken(reToken);
-
-//           const {newAccessToken, newRefreshToken} = refreshResponse.data;
-
-//           await SecureStore.setItemAsync(TOKEN.ACCESSTOKEN, newAccessToken);
-//           await SecureStore.setItemAsync(TOKEN.REFRESHTOKEN, newRefreshToken);
-
-//           isRefreshing = false;
-
-//           setAppAccessToken(newAccessToken);
-
-//           // EX: Add callback to failedQueue for retry request and process it
-//           return new Promise(resolve => {
-//             addFailedQueue(newToken => {
-//               originalRequest.headers.Authorization = createAuthToken(newToken);
-
-//               resolve(axiosClient(originalRequest));
-//             });
-
-//             processFailedQueue(newAccessToken);
-//           });
-//         } catch (_e) {
-//           reloadApp();
-//           return Promise.reject(error);
-//         }
-//       }
-
-//       // EX: ONLY add callback to failedQueue for retry request
-//       return new Promise(resolve => {
-//         addFailedQueue(newToken => {
-//           originalRequest.headers.Authorization = createAuthToken(newToken);
-
-//           resolve(axiosClient(originalRequest));
-//         });
-//       });
 //     }
 
-//     // EX: Handle other error
-//     return Promise.reject(error);
-//   },
+//     // EX: ONLY add callback to failedQueue for retry request
+//     return new Promise(resolve => {
+//       addFailedQueue(newToken => {
+//         originalRequest.headers.Authorization = createAuthToken(newToken);
+
+//         resolve(axiosClient(originalRequest));
+//       });
+//     });
+//   }
+
+//   // EX: Handle other error
+//   return Promise.reject(error);
+// },
 // );
 
 export default axiosClient;

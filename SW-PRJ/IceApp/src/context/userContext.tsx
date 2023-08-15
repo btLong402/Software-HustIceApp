@@ -113,6 +113,7 @@ export const UserProvider = ({children}: UserProviderProps) => {
 
   const getUserInfo = async (_id: string) => {
     const data = await UserService.getProfile(_id);
+    console.log("user profile: ",data);
     if (data?.status === 'OK') {
       dispatch({type: USER_REDUCER_TYPE.UPDATE_MANY, payload: data?.data});
     }

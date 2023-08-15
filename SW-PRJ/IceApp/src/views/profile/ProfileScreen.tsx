@@ -10,7 +10,7 @@ import React, {useState, useLayoutEffect, useRef} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {styles} from './styles';
 import DatePicker from 'react-native-date-picker';
-import {useToast, Box, Text, HStack, Spinner} from 'native-base';
+import {useToast, Box, Text, HStack, Spinner, Flex, Center} from 'native-base';
 import {ImagePickerModal} from './ImagePickerModal';
 import ImagePicker from 'react-native-image-crop-picker';
 import {useUser} from '../../context/userContext';
@@ -33,6 +33,7 @@ const ProfileScreen = ({route, navigation}) => {
   const {_id} = useAuth();
   const [userProfileState, setUserProfileState] = useState(userProfile);
   const userProfileRef = useRef(userProfileState);
+  const [isLoading, setIsLoading] = useState(false);
   useLayoutEffect(() => {
     if (!route.params?.data) return;
     setUserProfileState(previousState => ({
@@ -46,9 +47,9 @@ const ProfileScreen = ({route, navigation}) => {
       <Ionicons
         name="arrow-back"
         size={30}
-        style={{marginLeft: 10, color: 'crimson'}}
+        style={{marginLeft: 10, color: 'crimson', opacity: isLoading ? 0.5 : 1}}
         onPress={() => {
-          navigation.goBack();
+          !isLoading && navigation.goBack();
         }}
       />
     );
@@ -67,9 +68,11 @@ const ProfileScreen = ({route, navigation}) => {
       headerRight: () => (
         <TouchableOpacity
           onPress={async () => {
-            if (userProfileState !== userProfile) {
+            if (userProfileState !== userProfile && !isLoading) {
               // console.log('userProfileState Save: ', userProfileRef.current);
+              setIsLoading(true);
               await updateUserInfo(_id, userProfileRef.current);
+              setIsLoading(false);
               update_mess(null);
               navigation.goBack();
             }
@@ -79,7 +82,7 @@ const ProfileScreen = ({route, navigation}) => {
             style={{
               marginRight: 10,
               fontSize: 20,
-              opacity: userProfileState === userProfile ? 0.5 : 1,
+              opacity: userProfileState === userProfile && !isLoading ? 0.5 : 1,
               color: 'crimson',
             }}>
             Save
@@ -187,15 +190,31 @@ const ProfileScreen = ({route, navigation}) => {
   return (
     <ScrollView style={styles.container}>
       <SafeAreaView style={{flex: 1}}>
+        {isLoading && (
+          <Center
+            margin={0}
+            padding={0}
+            width={'100%'}
+            height={'100%'}
+            background={'rgba(0,0,0,0.3)'}
+            style={{
+              position: 'absolute',
+              zIndex: 999,
+              left: 0,
+            }}>
+            <Spinner size={'lg'} color="crimson" />
+          </Center>
+        )}
         <View style={styles.avatarContainer}>
           <View>
             <TouchableWithoutFeedback onPress={() => setVisible(true)}>
               <Image
                 style={styles.avatar}
                 source={{
-                  uri: userProfileState.avatar
-                    ? userProfileState.avatar.uri
-                    : 'https://anubis.gr/wp-content/uploads/2018/03/no-avatar.png',
+                  uri:
+                    userProfileState.avatar && userProfileState.avatar.uri
+                      ? userProfileState.avatar.uri
+                      : 'https://anubis.gr/wp-content/uploads/2018/03/no-avatar.png',
                 }}
               />
             </TouchableWithoutFeedback>
@@ -213,7 +232,6 @@ const ProfileScreen = ({route, navigation}) => {
             </TouchableWithoutFeedback>
           </View>
         </View>
-
         <View style={styles.infoContainer}>
           <View>
             <ProfileRow
