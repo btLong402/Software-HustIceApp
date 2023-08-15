@@ -29,8 +29,8 @@ export enum AuthActionType {
   SET_MESS = 'SET_MESS',
 }
 
-export const AuthProvider = ({children}) => {
-  const [state, dispatch] = React.useReducer((prevState, action) => {
+export const AuthProvider = ({children}: any) => {
+  const [state, dispatch] = React.useReducer((prevState: any, action: any) => {
     switch (action.type) {
       case AuthActionType.SET_MESS:
         return {
@@ -86,6 +86,7 @@ export const AuthProvider = ({children}) => {
       signIn: async data => {
         try {
           const resData: LoginResponse = await AuthService.login(data);
+          console.log('resData: ', resData);
           if (resData.status === 'OK') {
             dispatch({
               type: AuthActionType.SIGN_IN,

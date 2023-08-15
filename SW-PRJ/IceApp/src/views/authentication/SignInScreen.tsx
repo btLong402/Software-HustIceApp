@@ -7,8 +7,6 @@ import {
   Image,
   StyleSheet,
   TextInput,
-  Button,
-  ScrollView,
 } from 'react-native';
 import {Popover, useToast, Box, VStack} from 'native-base';
 import {Formik} from 'formik';
@@ -61,6 +59,7 @@ const SignIn = ({navigation}) => {
     if (mess?.type) {
       toast.show({
         placement: 'top',
+        duration: 2000,
         render: () => {
           return (
             <Box
@@ -91,12 +90,12 @@ const SignIn = ({navigation}) => {
           validationSchema={loginValidationSchema}
           initialValues={{phoneNumber: '', password: ''}}
           onSubmit={async values => {
-            console.log(values);
-            // try {
-            //   await signIn({...values});
-            // } catch (error) {
-            //   setMess({type: 'error', message: error.message});
-            // }
+            // console.log(values);
+            try {
+              await signIn({...values});
+            } catch (error) {
+              setMess({type: 'error', message: error.message});
+            }
           }}>
           {({
             handleChange,

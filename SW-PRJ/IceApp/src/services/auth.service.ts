@@ -11,6 +11,7 @@ const login = (data: any) => {
     data: data,
   })
     .then(async response => {
+      console.log('response: ', response);
       if (response.status === API_STATUS.SUCCESS) {
         if (response.headers['token']) {
           setAppAccessToken(response.data.token);

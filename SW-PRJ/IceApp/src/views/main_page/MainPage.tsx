@@ -138,7 +138,7 @@ const Menu = (props: MenuProps) => {
                 setVisible();
               }}
               key={index}>
-              <Text style={styles.h1}>{item.title}</Text>
+              {item.products.length != 0 ? (<Text style={styles.h1}>{item.title}</Text>) : null}
             </TouchableOpacity>
           ))}
         </Modal.Body>

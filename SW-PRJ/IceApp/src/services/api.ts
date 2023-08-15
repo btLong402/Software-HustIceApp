@@ -71,6 +71,7 @@ axiosClient.interceptors.response.use(
     if (response.status === API_STATUS.UNAUTHORIZED) {
       await reloadApp();
     }
+    return Promise.reject(error);
   },
 );
 // EX: Handle 401 error

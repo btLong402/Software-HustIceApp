@@ -72,10 +72,10 @@ const Test = ({navigation} : any) => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
-        <IconButton
+        {/* <IconButton
           icon={<Icon name="leftcircleo" size={30} color="black" />}
           onPress={() => navigation.goBack()}
-        />
+        /> */}
         <ImageBackground
           source={require('./component/products/how-to-prepare-Nigerian-fried-rice.png')}
           resizeMode="cover"
