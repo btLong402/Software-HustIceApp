@@ -18,17 +18,12 @@ import AntIcon from 'react-native-vector-icons/AntDesign';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useLayoutEffect} from 'react';
 
-const phoneRegex =
-  '^(0|84)(2(0[3-9]|1[0-6|8|9]|2[0-2|5-9]|3[2-9]|4[0-9]|5[1|2|4-9]|6[0-3|9]|7[0-7]|8[0-9]|9[0-4|6|7|9])|3[2-9]|5[5|6|8|9]|7[0|6-9]|8[0-6|8|9]|9[0-4|6-9])([0-9]{7})$';
+// const phoneRegex =
+//   '^(0|84)(2(0[3-9]|1[0-6|8|9]|2[0-2|5-9]|3[2-9]|4[0-9]|5[1|2|4-9]|6[0-3|9]|7[0-7]|8[0-9]|9[0-4|6|7|9])|3[2-9]|5[5|6|8|9]|7[0|6-9]|8[0-6|8|9]|9[0-4|6-9])([0-9]{7})$';
 
 const loginValidationSchema = yup.object().shape({
-  phoneNumber: yup
-    .string()
-    .matches(
-      new RegExp(phoneRegex),
-      'Phone number is a Vietnamese phone number with 10 digits',
-    ),
-  password: yup.string().min(6).max(50).required(),
+  phoneNumber: yup.string().required(),
+  password: yup.string().required(),
 });
 
 const SignIn = ({navigation}) => {
@@ -96,69 +91,73 @@ const SignIn = ({navigation}) => {
           validationSchema={loginValidationSchema}
           initialValues={{phoneNumber: '', password: ''}}
           onSubmit={async values => {
-            try {
-              await signIn({...values});
-            } catch (error) {
-              setMess({type: 'error', message: error.message});
-            }
+            console.log(values);
+            // try {
+            //   await signIn({...values});
+            // } catch (error) {
+            //   setMess({type: 'error', message: error.message});
+            // }
           }}>
           {({
             handleChange,
             handleBlur,
             handleSubmit,
             values,
-            errors,
+            isValid,
             touched,
-          }) => (
-            <>
-              <View style={styles.text_input}>
-                <View style={styles.input_border}>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Phone Number"
-                    onChangeText={handleChange('phoneNumber')}
-                    onBlur={handleBlur('phoneNumber')}
-                    value={values.phoneNumber}
-                  />
-                </View>
-                {errors.phoneNumber && touched.phoneNumber && (
-                  <Text
-                    style={StyleSheet.compose(styles.input_border, {
-                      color: 'red',
-                    })}>
-                    {errors.phoneNumber}
-                  </Text>
-                )}
-                <View style={styles.input_border}>
-                  <TextInput
-                    style={styles.input}
-                    secureTextEntry={true}
-                    placeholder="Password"
-                    onChangeText={handleChange('password')}
-                    onBlur={handleBlur('password')}
-                    value={values.password}
-                  />
-                </View>
-                {errors.password && touched.password && (
+          }) => {
+            const isDisabled =
+              !isValid ||
+              (Object.keys(touched).length === 0 &&
+                touched.constructor === Object);
+            return (
+              <>
+                <View style={styles.text_input}>
+                  <View style={styles.input_border}>
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Phone Number"
+                      onChangeText={handleChange('phoneNumber')}
+                      onBlur={handleBlur('phoneNumber')}
+                      value={values.phoneNumber}
+                    />
+                  </View>
+                  {/* {errors.phoneNumber &&
+                  touched.phoneNumber &&
+                  showToastError(errors.phoneNumber)} */}
+                  <View style={styles.input_border}>
+                    <TextInput
+                      style={styles.input}
+                      secureTextEntry={true}
+                      placeholder="Password"
+                      onChangeText={handleChange('password')}
+                      onBlur={handleBlur('password')}
+                      value={values.password}
+                    />
+                  </View>
+                  {/* {errors.password && touched.password && (
                   <Text
                     style={StyleSheet.compose(styles.input_border, {
                       color: 'red',
                     })}>
                     {errors.password}
                   </Text>
-                )}
-                <TouchableOpacity style={styles.forgot_password}>
-                  <Text style={styles.h2}>Forgot Password?</Text>
+                )} */}
+                  <TouchableOpacity style={styles.forgot_password}>
+                    <Text style={styles.h2}>Forgot Password?</Text>
+                  </TouchableOpacity>
+                </View>
+                <TouchableOpacity
+                  style={StyleSheet.compose(styles.sign_in_btn, {
+                    backgroundColor: isDisabled ? 'gray' : '#FC4F00',
+                  })}
+                  onPress={handleSubmit}
+                  disabled={isDisabled}>
+                  <Text style={styles.h1}>Eat Away!</Text>
                 </TouchableOpacity>
-              </View>
-              <TouchableOpacity
-                style={styles.sign_in_btn}
-                onPress={handleSubmit}
-                disabled={errors.phoneNumber || errors.password}>
-                <Text style={styles.h1}>Eat Away!</Text>
-              </TouchableOpacity>
-            </>
-          )}
+              </>
+            );
+          }}
         </Formik>
         {/* <Text style={styles.h3}>Sign in with</Text> */}
         {/* <View style={styles.social_sign_in}>

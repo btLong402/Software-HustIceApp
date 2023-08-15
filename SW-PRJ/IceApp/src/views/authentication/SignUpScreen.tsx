@@ -16,8 +16,6 @@ import {ScrollView, useToast, Box} from 'native-base';
 import {useAuth} from '../../context/authContext';
 import authService from '../../services/auth.service';
 
-
-
 const phoneRegex =
   '^(0|84)(2(0[3-9]|1[0-6|8|9]|2[0-2|5-9]|3[2-9]|4[0-9]|5[1|2|4-9]|6[0-3|9]|7[0-7]|8[0-9]|9[0-4|6|7|9])|3[2-9]|5[5|6|8|9]|7[0|6-9]|8[0-6|8|9]|9[0-4|6-9])([0-9]{7})$';
 
@@ -137,93 +135,99 @@ const SignUp = ({navigation}) => {
             values,
             errors,
             touched,
-          }) => (
-            <>
-              <View style={styles.text_input}>
-                <View style={styles.input_border}>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Phone Number"
-                    onChangeText={handleChange('phoneNumber')}
-                    onBlur={handleBlur('phoneNumber')}
-                    value={values.phoneNumber}
-                  />
+          }) => {
+            const isDisabled =
+              (Object.keys(touched).length === 0 &&
+                touched.constructor === Object) ||
+              errors.confirmPassword ||
+              errors.password ||
+              errors.username ||
+              errors.phoneNumber;
+            return (
+              <>
+                <View style={styles.text_input}>
+                  <View style={styles.input_border}>
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Phone Number"
+                      onChangeText={handleChange('phoneNumber')}
+                      onBlur={handleBlur('phoneNumber')}
+                      value={values.phoneNumber}
+                    />
+                  </View>
+                  {errors.phoneNumber && touched.phoneNumber && (
+                    <Text
+                      style={StyleSheet.compose(styles.input_border, {
+                        color: 'red',
+                      })}>
+                      {errors.phoneNumber}
+                    </Text>
+                  )}
+                  <View style={styles.input_border}>
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Username"
+                      onChangeText={handleChange('username')}
+                      onBlur={handleBlur('username')}
+                      value={values.username}
+                    />
+                  </View>
+                  {errors.username && touched.username && (
+                    <Text
+                      style={StyleSheet.compose(styles.input_border, {
+                        color: 'red',
+                      })}>
+                      {errors.username}
+                    </Text>
+                  )}
+                  <View style={styles.input_border}>
+                    <TextInput
+                      style={styles.input}
+                      secureTextEntry={true}
+                      placeholder="Password"
+                      onChangeText={handleChange('password')}
+                      onBlur={handleBlur('password')}
+                      value={values.password}
+                    />
+                  </View>
+                  {errors.password && touched.password && (
+                    <Text
+                      style={StyleSheet.compose(styles.input_border, {
+                        color: 'red',
+                      })}>
+                      {errors.password}
+                    </Text>
+                  )}
+                  <View style={styles.input_border}>
+                    <TextInput
+                      style={styles.input}
+                      secureTextEntry={true}
+                      placeholder="Confirm Password"
+                      onChangeText={handleChange('confirmPassword')}
+                      onBlur={handleBlur('confirmPassword')}
+                      value={values.confirmPassword}
+                    />
+                  </View>
+                  {errors.confirmPassword && touched.confirmPassword && (
+                    <Text
+                      style={StyleSheet.compose(styles.input_border, {
+                        color: 'red',
+                      })}>
+                      {errors.confirmPassword}
+                    </Text>
+                  )}
                 </View>
-                {errors.phoneNumber && touched.phoneNumber && (
-                  <Text
-                    style={StyleSheet.compose(styles.input_border, {
-                      color: 'red',
-                    })}>
-                    {errors.phoneNumber}
-                  </Text>
-                )}
-                <View style={styles.input_border}>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Username"
-                    onChangeText={handleChange('username')}
-                    onBlur={handleBlur('username')}
-                    value={values.username}
-                  />
-                </View>
-                {errors.username && touched.username && (
-                  <Text
-                    style={StyleSheet.compose(styles.input_border, {
-                      color: 'red',
-                    })}>
-                    {errors.username}
-                  </Text>
-                )}
-                <View style={styles.input_border}>
-                  <TextInput
-                    style={styles.input}
-                    secureTextEntry={true}
-                    placeholder="Password"
-                    onChangeText={handleChange('password')}
-                    onBlur={handleBlur('password')}
-                    value={values.password}
-                  />
-                </View>
-                {errors.password && touched.password && (
-                  <Text
-                    style={StyleSheet.compose(styles.input_border, {
-                      color: 'red',
-                    })}>
-                    {errors.password}
-                  </Text>
-                )}
-                <View style={styles.input_border}>
-                  <TextInput
-                    style={styles.input}
-                    secureTextEntry={true}
-                    placeholder="Confirm Password"
-                    onChangeText={handleChange('confirmPassword')}
-                    onBlur={handleBlur('confirmPassword')}
-                    value={values.confirmPassword}
-                  />
-                </View>
-                {errors.confirmPassword && touched.confirmPassword && (
-                  <Text
-                    style={StyleSheet.compose(styles.input_border, {
-                      color: 'red',
-                    })}>
-                    {errors.confirmPassword}
-                  </Text>
-                )}
-              </View>
-              <TouchableOpacity
-                style={styles.sign_up_btn}
-                onPress={handleSubmit}
-                disabled={
-                  errors.phoneNumber ||
-                  errors.password ||
-                  errors.username ||
-                  errors.confirmPassword
-                }>
-                <Text style={styles.h1}>Never Hungry Again!</Text>
-              </TouchableOpacity>
-            </>
-          )}
+                <TouchableOpacity
+                  style={StyleSheet.compose(styles.sign_up_btn, {
+                    backgroundColor: isDisabled ? 'gray' : '#FC4F00',
+                  })}
+                  onPress={handleSubmit}
+                  disabled={isDisabled}>
+                  <Text style={styles.h1}>Never Hungry Again!</Text>
+                </TouchableOpacity>
+              </>
+            );
+          }}
         </Formik>
       </View>
     </ScrollView>

@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {API_STATUS} from '../utils/constants';
 import {Platform} from 'react-native';
 import RNRestart from 'react-native-restart'; // Import package from node modules
- 
+
 export const config = {
   baseURL: Platform.OS === 'ios' ? Config.API_URL_IOS : Config.API_URL_AND,
   validateStatus: status => status >= 200 && status < 400,
@@ -38,7 +38,7 @@ async function reloadApp() {
 
 const axiosClient = axios.create(config);
 
-export function setAppAccessToken(token:any) {
+export function setAppAccessToken(token: any) {
   axiosClient.defaults.headers.common['TOKEN'] = token;
 }
 
