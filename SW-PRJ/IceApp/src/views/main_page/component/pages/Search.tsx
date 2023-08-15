@@ -47,8 +47,9 @@ export default function Search({navigation}: any) {
   const [searchInput, setSearchInput] = useState<string>('');
   const [filter, setFilter] = useState<Product[]>([]);
   const {productList} = useAppSelector(state => state.productList);
+  const [isSearch, setIsSearch] = useState<boolean>(false);
   const filterData = () => {
-    if (searchInput) {
+    if (searchInput && productList != null) {
       const filteredItems = productList.filter(item => {
         const itemName = item.name ? item.name.toUpperCase() : '';
         const textInput = searchInput.toUpperCase();
@@ -69,37 +70,53 @@ export default function Search({navigation}: any) {
   return (
     <SafeAreaView style={{flex: 1}}>
       <View style={{backgroundColor: 'white'}}>
-        <IconButton
+        {/* <IconButton
           icon={<Icon name="leftcircleo" size={30} color="black" />}
           onPress={() => navigation.navigate('MyTabs')}
-        />
+        /> */}
         <TextInput
           style={styles.textInputStyle}
           underlineColorAndroid="transparent"
           placeholder="Search Here"
           value={searchInput}
-          onChangeText={text => setSearchInput(text)}
-        />
-        <FlatList
-          data={filter}
-          keyExtractor={(item: Product, index: number) =>
-            item.productId + index
-          }
-          style={{flexGrow: 0}}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{padding: 20}}
-          renderItem={({item}) => {
-            return (
-              <RenderItem
-                key={item.productId}
-                name={item.name}
-                thumbnail={item.image}
-                basePrice={item.basePrice}
-                handleClick={handleClick}
-              />
-            );
+          onChangeText={text => {
+            if (text.length != 0) {
+              setSearchInput(text);
+              setIsSearch(true);
+            } else {
+              setSearchInput(text);
+              setIsSearch(false);
+            }
           }}
         />
+        {filter.length != 0 ? (
+          <FlatList
+            data={filter}
+            keyExtractor={(item: Product, index: number) =>
+              item.productId + index
+            }
+            style={{flexGrow: 0}}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{padding: 20}}
+            renderItem={({item}) => {
+              return (
+                <RenderItem
+                  key={item.productId}
+                  name={item.name}
+                  thumbnail={item.image}
+                  basePrice={item.basePrice}
+                  handleClick={handleClick}
+                />
+              );
+            }}
+          />
+        ) : (
+          isSearch === true && (
+            <View style={{alignItems: 'center', justifyContent: 'center'}}>
+              <Text>No options</Text>
+            </View>
+          )
+        )}
       </View>
     </SafeAreaView>
   );

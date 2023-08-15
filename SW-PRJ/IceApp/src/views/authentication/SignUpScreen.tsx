@@ -27,7 +27,7 @@ const signUpValidationSchema = yup.object().shape({
     .matches(
       new RegExp(phoneRegex),
       'Phone number is a Vietnamese phone number with 10 digits',
-    ),
+    ).required(),
   username: yup
     .string()
     .trim()
@@ -42,7 +42,7 @@ const signUpValidationSchema = yup.object().shape({
     .required('Please confirm your password'),
 });
 
-const SignUp = ({navigation}) => {
+const SignUp = ({navigation} : any) => {
   const toast = useToast();
 
   const {signUp, mess, setMess} = useAuth();
@@ -126,7 +126,7 @@ const SignUp = ({navigation}) => {
             const {password, phoneNumber, username} = values;
             try {
               await signUp({username, password, phoneNumber});
-            } catch (error) {
+            } catch (error: any) {
               setMess({type: 'error', message: error.message});
             }
           }}>
@@ -150,12 +150,7 @@ const SignUp = ({navigation}) => {
                   />
                 </View>
                 {errors.phoneNumber && touched.phoneNumber && (
-                  <Text
-                    style={StyleSheet.compose(styles.input_border, {
-                      color: 'red',
-                    })}>
-                    {errors.phoneNumber}
-                  </Text>
+                  <Text style={{color: 'black'}}>{errors.phoneNumber}</Text>
                 )}
                 <View style={styles.input_border}>
                   <TextInput
@@ -167,12 +162,7 @@ const SignUp = ({navigation}) => {
                   />
                 </View>
                 {errors.username && touched.username && (
-                  <Text
-                    style={StyleSheet.compose(styles.input_border, {
-                      color: 'red',
-                    })}>
-                    {errors.username}
-                  </Text>
+                  <Text style={{color: 'black'}}>{errors.username}</Text>
                 )}
                 <View style={styles.input_border}>
                   <TextInput
@@ -185,12 +175,7 @@ const SignUp = ({navigation}) => {
                   />
                 </View>
                 {errors.password && touched.password && (
-                  <Text
-                    style={StyleSheet.compose(styles.input_border, {
-                      color: 'red',
-                    })}>
-                    {errors.password}
-                  </Text>
+                  <Text style={{color: 'black'}}>{errors.password}</Text>
                 )}
                 <View style={styles.input_border}>
                   <TextInput
@@ -203,22 +188,17 @@ const SignUp = ({navigation}) => {
                   />
                 </View>
                 {errors.confirmPassword && touched.confirmPassword && (
-                  <Text
-                    style={StyleSheet.compose(styles.input_border, {
-                      color: 'red',
-                    })}>
-                    {errors.confirmPassword}
-                  </Text>
+                  <Text style={{color: 'black'}}>{errors.confirmPassword}</Text>
                 )}
               </View>
               <TouchableOpacity
                 style={styles.sign_up_btn}
                 onPress={handleSubmit}
                 disabled={
-                  errors.phoneNumber ||
-                  errors.password ||
-                  errors.username ||
-                  errors.confirmPassword
+                  errors.phoneNumber === null ||
+                  errors.password === null ||
+                  errors.username === null ||
+                  errors.confirmPassword === null
                 }>
                 <Text style={styles.h1}>Never Hungry Again!</Text>
               </TouchableOpacity>
