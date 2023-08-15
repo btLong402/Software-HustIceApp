@@ -26,6 +26,4 @@ export const createClient = (api_root: string, apiConfig = {}) => {
   };
 };
 
-export const client = createClient(
-  Platform.OS === 'ios' ? Config.API_URL_IOS : Config.API_URL_AND,
-);
+export const client = createClient('http://10.0.2.2:3001/api');

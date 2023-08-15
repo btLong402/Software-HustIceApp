@@ -32,12 +32,6 @@ public class MainActivity extends ReactActivity {
   @Override
   protected ReactActivityDelegate createReactActivityDelegate() {
     return new DefaultReactActivityDelegate(
-<<<<<<< HEAD
-        this,
-        getMainComponentName(),
-        // If you opted-in for the New Architecture, we enable the Fabric Renderer.
-        DefaultNewArchitectureEntryPoint.getFabricEnabled());
-=======
       this,
       getMainComponentName(),
       // If you opted-in for the New Architecture, we enable the Fabric Renderer.
@@ -45,6 +39,5 @@ public class MainActivity extends ReactActivity {
       // If you opted-in for the New Architecture, we enable Concurrent React (i.e. React 18).
       DefaultNewArchitectureEntryPoint.getConcurrentReactEnabled() // concurrentRootEnabled
     );
->>>>>>> aa21c7eb1a2b5111338bdd4a1d44470af741d1b6
   }
 }
