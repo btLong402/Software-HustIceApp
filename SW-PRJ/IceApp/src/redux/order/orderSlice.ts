@@ -1,11 +1,12 @@
 /* eslint-disable prettier/prettier */
 import {createSlice} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
+import { Topping } from '../topping/toppingSlice';
 
 export interface OrderLine {
   productId: string;
   includedTopping: Array<{toppingId: string}>;
-  size: string;
+  size?: string;
   quantity: number;
   subTotal: number;
 }
@@ -39,7 +40,7 @@ export const orderSlice = createSlice({
     addNewOrderLine: (state, action: PayloadAction<OrderLine>) => {
       state.orderLines.push(action.payload);
     },
-    deleteOrderLine: (state, action: PayloadAction<OrderLine>) => {
+    deleteOrderLine: (state, action: PayloadAction<{productId: string}>) => {
       const index = state.orderLines.findIndex(
         orderLine => orderLine.productId === action.payload.productId,
       );
@@ -64,41 +65,6 @@ export const orderSlice = createSlice({
     updateTime: (state, action: PayloadAction<number>) => {
       state.createAt = action.payload;
     },
-    addNewTopping: (
-      state,
-      action: PayloadAction<{productId: string; toppingId: string}>,
-    ) => {
-      const orderLineIndex = state.orderLines.findIndex(
-        orderLine => orderLine.productId === action.payload.productId,
-      );
-      if (orderLineIndex !== -1) {
-        state.orderLines[orderLineIndex].includedTopping?.push({
-          toppingId: action.payload.toppingId,
-        });
-      }
-    },
-    deleteTopping: (
-      state,
-      action: PayloadAction<{productId: string; toppingId: string}>,
-    ) => {
-      const orderLineIndex = state.orderLines.findIndex(
-        orderLine => orderLine.productId === action.payload.productId,
-      );
-      if (orderLineIndex !== -1) {
-        const toppingIndex =
-          state.orderLines[orderLineIndex].includedTopping.findIndex(
-            topping => topping.toppingId === action.payload.toppingId,
-          );
-        if (
-          toppingIndex !== -1
-        ) {
-          state.orderLines[orderLineIndex].includedTopping.splice(
-            toppingIndex,
-            1,
-          );
-        }
-      }
-    },
   },
 });
 
@@ -109,8 +75,6 @@ export const {
   updateOrderLine,
   deleteOrderLine,
   updateTime,
-  addNewTopping,
-  deleteTopping,
 } = orderSlice.actions;
 
 export default orderSlice.reducer;

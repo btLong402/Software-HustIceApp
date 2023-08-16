@@ -21,11 +21,11 @@ export interface Product {
 }
 
 export interface ProductList {
-  productList: Product[] | null;
+  productList: Product[];
 }
 
 const initialState: ProductList = {
-  productList: null,
+  productList: [],
 };
 
 export const productSlice = createSlice({
@@ -33,12 +33,9 @@ export const productSlice = createSlice({
   initialState: initialState,
   reducers: {
     addNewProduct: (state, action: PayloadAction<Product>) => {
-      if (state.productList === null) {
-        state.productList = [];
-      }
       state.productList.push(action.payload);
     },
-  },
+  }
 });
 
 export const {addNewProduct} = productSlice.actions;

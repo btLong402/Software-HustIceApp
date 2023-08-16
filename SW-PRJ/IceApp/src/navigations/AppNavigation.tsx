@@ -58,13 +58,12 @@ function AppNavigation(): JSX.Element {
     USER_REDUCER_TYPE,
     dispatch: userDispatch,
   } = useUser();
-  const products = useAppSelector(state => state.productList);
-  console.log('user', user);
+  // console.log('user', user);
 
   // console.log('token', token);
   // console.log('_id', _id);
-  console.log('isSignout', isSignout);
-  console.log('products', products);
+  // console.log('isSignout', isSignout);
+  // console.log('products', products);
 
   const productDispatch = useAppDispatch();
 
@@ -112,7 +111,7 @@ function AppNavigation(): JSX.Element {
           });
           product.sizeList.forEach((s: any) => {
             size.push({
-              sizeId: String(s._id),
+              sizeId: String(s.sizeId),
             });
           });
           let newProduct: Product = {
@@ -162,13 +161,6 @@ function AppNavigation(): JSX.Element {
       });
   };
 
-  const loadUserInfo = async (_id: string) => {
-    const isHaveUserInfo = await getUserInfoStorage();
-    if (!isHaveUserInfo) {
-      await getUserInfo(_id);
-    }
-  };
-
   const loadAuthInfo = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
@@ -180,9 +172,6 @@ function AppNavigation(): JSX.Element {
     }
   };
 
-  const delay = (ms: number, resolve: (value?: unknown) => void) =>
-    new Promise(resolve => setTimeout(resolve, ms));
-
   useEffect(() => {
     if (isSignout !== null) return;
     const initLoad = async () => {
@@ -192,8 +181,7 @@ function AppNavigation(): JSX.Element {
       setIsLoading(false);
     };
     initLoad();
-    
-  }, []);
+  }, [isSignout]);
 
   useEffect(() => {
     if (isSignout !== false || !_id) return;
@@ -222,7 +210,11 @@ function AppNavigation(): JSX.Element {
             />
             <Stack.Screen name="SignIn" component={SignIn} />
             <Stack.Screen name="SignUp" component={SignUp} />
-            <Stack.Screen name="Test" component={Test} />
+            <Stack.Screen
+              name="Test"
+              component={Test}
+              options={{headerShown: false}}
+            />
             <Stack.Screen name="Search" component={Search} />
           </>
         ) : (
@@ -232,7 +224,11 @@ function AppNavigation(): JSX.Element {
               component={MainTabs}
               options={{headerShown: false}}
             />
-            <Stack.Screen name="Test" component={Test} />
+            <Stack.Screen
+              name="Test"
+              component={Test}
+              options={{headerShown: false}}
+            />
             <Stack.Screen name="Search" component={Search} />
             <Stack.Screen name="Cart" component={CartScreen} />
             <Stack.Screen name="EditProfile" component={EditProfileScreen} />

@@ -1,38 +1,41 @@
-/* eslint-disable prettier/prettier */
-
 import {Category} from '../redux/category/categorySlice';
 import {Product} from '../redux/product/productSlice';
+import {Size} from '../redux/size/sizeSlice';
+import {Topping} from '../redux/topping/toppingSlice';
+import {Choose} from '../redux/order/orderSupportSlice';
 
-export const getData = (productList: Product[], category: Category[]) => {
-  const Data: Array<{
-    title: string;
-    products: Array<{
-      productId: string;
-      name: string;
-      basePrice: number;
-      thumbnail: string;
-    }>;
-  }> = [];
-
-  category.forEach((c: Category) => {
-    const products: Product[] = [];
-    productList.forEach((p: Product) => {
-      p.category.forEach((ca: any) => {
-        if (ca.title === c.title) {
-          products.push(p);
-        }
+export const getData = (
+  productList: Product[],
+  categoryList: Category[],
+  sizeList: Size[],
+  toppingList: Topping[],
+) => {
+  return categoryList.map((category: Category) => {
+    const products: Choose[] = productList
+      .filter((product: Product) =>
+        product.category.some(cat => cat.title === category.title),
+      )
+      .map((product: Product) => {
+        const productSizes = sizeList.filter(size =>
+          product.sizeList.some(ps => 
+            ps.sizeId === size.sizeId
+          ),
+        );
+        const productToppings = toppingList.filter(topping =>
+          product.toppingList.some(pt => pt.toppingId === topping.toppingId),
+        );
+        return {
+          productId: product.productId,
+          basePrice: product.basePrice,
+          thumbnail: product.image,
+          name: product.name,
+          size: productSizes,
+          toppingList: productToppings,
+        };
       });
-    });
-    Data.push({
-      title: c.title,
-      products: products.map(p => ({
-        productId: p.productId,
-        name: p.name,
-        basePrice: p.basePrice,
-        thumbnail: p.image,
-      })),
-    });
+    return {
+      title: category.title,
+      products: products,
+    };
   });
-
-  return Data;
 };

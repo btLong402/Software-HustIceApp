@@ -39,7 +39,7 @@ const updateProfile = async (id, data) => {
   // console.log('udpateProfile: ', data);
   let formData = new FormData();
   for (let key in data) {
-    // console.log(`data[${key}]: `, data[key]);
+    console.log(`data[${key}]: `, data[key]);
     if (key === 'dob') {
       formData.append(key, new Date(data[key]).toISOString());
     } else formData.append(key, data[key]);

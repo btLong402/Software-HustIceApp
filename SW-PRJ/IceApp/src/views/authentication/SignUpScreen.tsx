@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -37,7 +37,7 @@ const signUpValidationSchema = yup.object().shape({
   password: yup.string().min(6).max(50).required(),
   confirmPassword: yup
     .string()
-    .oneOf([yup.ref('password'), null], 'Passwords must match')
+    .oneOf([yup.ref('password'), undefined], 'Passwords must match')
     .required('Please confirm your password'),
 });
 
@@ -45,7 +45,7 @@ const SignUp = ({navigation}: any) => {
   const toast = useToast();
 
   const {signUp, mess, setMess} = useAuth();
-  let isOpen = false;
+  const [isOpen, setIsOpen] = useState(false);
   useLayoutEffect(() => {
     const headerLeft = () => (
       <Ionicons
@@ -95,19 +95,20 @@ const SignUp = ({navigation}: any) => {
     }
   }, [mess]);
 
-  const scrollViewRef = useRef();
+  const scrollViewRef = useRef(null);
   const handleSubmit = async () => {
     await authService.register({});
+  };
+  const handleContentSizeChange = () => {
+    if (!isOpen && scrollViewRef.current !== null) {
+      scrollViewRef.current.scrollToEnd({animated: true});
+      setIsOpen(true);
+    }
   };
   return (
     <ScrollView
       ref={scrollViewRef}
-      onContentSizeChange={() => {
-        if (!isOpen) {
-          scrollViewRef.current.scrollToEnd({animated: true});
-          isOpen = true;
-        }
-      }}>
+      onContentSizeChange={handleContentSizeChange}>
       <View style={styles.container}>
         <Image
           source={require('../../assets/images/logo.png')}
@@ -140,10 +141,10 @@ const SignUp = ({navigation}: any) => {
             const isDisabled =
               (Object.keys(touched).length === 0 &&
                 touched.constructor === Object) ||
-              errors.confirmPassword ||
-              errors.password ||
-              errors.username ||
-              errors.phoneNumber;
+              errors.confirmPassword === null ||
+              errors.password === null ||
+              errors.username === null ||
+              errors.phoneNumber === null;
             return (
               <>
                 <View style={styles.text_input}>
@@ -205,7 +206,7 @@ const SignUp = ({navigation}: any) => {
                   style={StyleSheet.compose(styles.sign_up_btn, {
                     backgroundColor: isDisabled ? 'gray' : '#FC4F00',
                   })}
-                  onPress={handleSubmit}
+                  onPress={() => handleSubmit()}
                   disabled={isDisabled}>
                   <Text style={styles.h1}>Never Hungry Again!</Text>
                 </TouchableOpacity>
