@@ -7,7 +7,6 @@
  */
 
 import React, {useEffect, useState} from 'react';
-import MainScreen from '../views/main_page';
 import MeScreen from '../views/profile/MeScreen';
 import {Badge, Box} from 'native-base';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';

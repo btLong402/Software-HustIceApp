@@ -22,21 +22,21 @@ import {useAppSelector, useAppDispatch} from '../../redux/hook';
 import MultiCheckBox from '../../components/multiChoice';
 import {Size} from '../../redux/size/sizeSlice';
 import {
-  addNewTopping,
-  deleteTopping,
   incrementQuantity,
   decrementQuantity,
+  setSize,
 } from '../../redux/order/orderSupportSlice';
 import {useNavigation} from '@react-navigation/native';
-import {deleteOrderLine} from '../../redux/order/orderSlice';
+import {deleteOrderLine, addNewOrderLine } from '../../redux/order/orderSlice';
 function Test({route}: any) {
   const navigation = useNavigation();
-  const [selectedIndex, setSelectedIndex] = useState<number>();
+  const [selectedIndex, setSelectedIndex] = useState<number>(0);
   const dispatch = useAppDispatch();
   // const {productId, basePrice, size, thumbnail, toppingList} = useAppSelector(state => state.chooseProduct);
   const {product} = route.params;
   const {productId, basePrice, size, thumbnail, toppingList, name} = product;
   let {quantity, subTotal} = useAppSelector(state => state.orderLine.line);
+  let {line} = useAppSelector(state => state.orderLine);
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
@@ -44,7 +44,6 @@ function Test({route}: any) {
           <IconButton
             icon={<Icon name="leftcircleo" size={30} color="black" />}
             onPress={() => {
-              dispatch(deleteOrderLine({productId: productId}));
               navigation.pop();
             }}
           />
@@ -82,7 +81,10 @@ function Test({route}: any) {
               checkedIcon="dot-circle-o"
               uncheckedIcon="circle-o"
               checked={selectedIndex === i}
-              onPress={() => setSelectedIndex(i)}
+              onPress={() => {
+                setSelectedIndex(i);
+                dispatch(setSize(e));
+              }}
               containerStyle={{backgroundColor: '#FFF2F2', borderRadius: 30}}
             />
           ))}
@@ -106,7 +108,12 @@ function Test({route}: any) {
             onPress={() => dispatch(incrementQuantity())}
           />
         </View>
-        <TouchableOpacity style={styles.btn_buy_now}>
+        <TouchableOpacity style={styles.btn_buy_now} onPress={
+          () => {
+            dispatch(addNewOrderLine(line));
+            navigation.pop();
+          }
+        }>
           <Text style={styles.name}>Buy Now</Text>
         </TouchableOpacity>
       </View>

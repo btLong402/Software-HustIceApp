@@ -36,6 +36,7 @@ const Page = (props: PageProps) => {
                 />
                 <IconButton
                   icon={<Image source={require('../products/cart.png')} />}
+                  onPress={() => navigation.push('Cart')}
                 />
               </HStack>
             }

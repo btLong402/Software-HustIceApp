@@ -3,6 +3,7 @@ import {Product} from '../redux/product/productSlice';
 import {Size} from '../redux/size/sizeSlice';
 import {Topping} from '../redux/topping/toppingSlice';
 import {Choose} from '../redux/order/orderSupportSlice';
+import {useAppSelector} from '../redux/hook';
 
 export const getData = (
   productList: Product[],
@@ -14,7 +15,7 @@ export const getData = (
     const products: Choose[] = productList
       .filter((product: Product) =>
         product.category.some(cat => {
-          let t = cat.title === category.title
+          let t = cat.title === category.title;
           return t;
         }),
       )
@@ -39,4 +40,13 @@ export const getData = (
       products: products,
     };
   });
+};
+
+export const getSizePrice = (sizeId: string) => {
+  const {sizeList} = useAppSelector(state => state.sizeList);
+  let price: number = 0;
+  for (let size of sizeList) {
+    if (size.sizeId === sizeId) price = size.price;
+  }
+  return price;
 };

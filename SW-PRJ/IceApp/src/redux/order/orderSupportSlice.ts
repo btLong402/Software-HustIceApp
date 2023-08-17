@@ -3,6 +3,7 @@ import type {PayloadAction} from '@reduxjs/toolkit';
 import {Size} from '../size/sizeSlice';
 import {Topping} from '../topping/toppingSlice';
 import {OrderLine} from './orderSlice';
+import { getSizePrice } from '../../utils';
 export interface Choose {
   productId: string;
   basePrice: number;
@@ -12,7 +13,7 @@ export interface Choose {
   toppingList: Array<Topping>;
 }
 
-const initialState: {line: OrderLine, tmp: number} = {
+const initialState: {line: OrderLine, tmp: number, oldSize: number} = {
   line: {
     productId: '',
     includedTopping: [],
@@ -20,6 +21,7 @@ const initialState: {line: OrderLine, tmp: number} = {
     subTotal: 0,
   },
   tmp: 0,
+  oldSize: 0,
 };
 
 export const orderLineSlice = createSlice({
@@ -36,6 +38,7 @@ export const orderLineSlice = createSlice({
       };
       state.line = newOrderLine;
       state.tmp = action.payload.basePrice;
+      state.oldSize = action.payload.size[0].price;
     },
     incrementQuantity: state => {
       state.line.quantity++;
@@ -62,6 +65,14 @@ export const orderLineSlice = createSlice({
       state.tmp += action.payload.price;
       state.line.subTotal = state.line.quantity * state.tmp;
     },
+    setSize: (state, action: PayloadAction<Size>) => {
+      if(state.line.size){
+        state.tmp += action.payload.price - state.oldSize;
+        state.line.size = action.payload.sizeId;
+        state.oldSize = action.payload.price;
+        state.line.subTotal = state.line.quantity * state.tmp;
+      }
+    }
   },
 });
 
@@ -71,6 +82,7 @@ export const {
   decrementQuantity,
   deleteTopping,
   addNewTopping,
+  setSize,
 } = orderLineSlice.actions;
 
 export default orderLineSlice.reducer;

@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import {createSlice} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
-import { Topping } from '../topping/toppingSlice';
+import {Topping} from '../topping/toppingSlice';
 
 export interface OrderLine {
   productId: string;
@@ -38,13 +38,24 @@ export const orderSlice = createSlice({
   initialState: initialState,
   reducers: {
     addNewOrderLine: (state, action: PayloadAction<OrderLine>) => {
-      state.orderLines.push(action.payload);
+      const index = state.orderLines.findIndex(
+        orderLine => orderLine.productId === action.payload.productId,
+      );
+      if (index !== -1) {
+        state.totalPrice +=
+          action.payload.subTotal - state.orderLines[index].subTotal;
+        state.orderLines[index] = action.payload;
+      } else {
+        state.orderLines.push(action.payload);
+        state.totalPrice += action.payload.subTotal;
+      }
     },
     deleteOrderLine: (state, action: PayloadAction<{productId: string}>) => {
       const index = state.orderLines.findIndex(
         orderLine => orderLine.productId === action.payload.productId,
       );
       if (index !== -1) {
+        state.totalPrice -= state.orderLines[index].subTotal;
         state.orderLines.splice(index, 1);
       }
     },
