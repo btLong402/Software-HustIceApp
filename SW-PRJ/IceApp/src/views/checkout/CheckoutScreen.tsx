@@ -20,7 +20,7 @@ import ShippingSegment from './ShippingSegment';
 import MasterCardIcon from '../../assets/images/Mastercard_2019_logo.svg';
 import * as yup from 'yup';
 import {Formik, useFormik} from 'formik';
-import { useAppSelector } from '../../redux/hook';
+import {useAppSelector} from '../../redux/hook';
 const cardInputValidationSchema = yup.object().shape({
   cardNumber: yup
     .string()
@@ -166,14 +166,22 @@ const ProcessSegment = ({screenIndex, onClick}) => {
       <View style={localStyles.processContainer}>
         {processArray.map((label, index) => {
           if (index <= screenIndex) {
-            return <Text style={{opacity: 0.9}}>{label}</Text>;
-          } else return <Text style={{opacity: 0.3}}>{label}</Text>;
+            return (
+              <Text style={{opacity: 0.9}} key={index}>
+                {label}
+              </Text>
+            );
+          } else
+            return (
+              <Text style={{opacity: 0.3}} key={index}>
+                {label}
+              </Text>
+            );
         })}
       </View>
     </View>
   );
 };
-
 
 const PaymentCard = () => {
   return (
@@ -291,7 +299,7 @@ const CardForm = () => {
         onBlur={formik.handleBlur('cardholderName')}
         value={formik.values.cardholderName}
         style={{
-          fontSize: 16,  
+          fontSize: 16,
           paddingVertical: 15,
           paddingHorizontal: 20,
           backgroundColor: '#f6f6f6',
@@ -366,7 +374,7 @@ const PriceSegment = () => {
   );
 };
 const foodContainer = StyleSheet.compose(styles.childContainer, {
-  height: 250
+  height: 250,
 });
 
 const priceRow = StyleSheet.compose(styles.row, {
@@ -421,8 +429,8 @@ const ProdSegment = () => {
 const SubmitSegment = () => {
   return (
     <View>
-      < ProdSegment />
-      <PriceSegment/>
+      <ProdSegment />
+      <PriceSegment />
     </View>
   );
 };
@@ -470,7 +478,7 @@ const CheckoutScreen = ({navigation}) => {
         />
         <Spacer height={30} />
         {screenIndex === 0 ? (
-          <ShippingSegment navigation={navigation}  setDisable={setDisable}/>
+          <ShippingSegment navigation={navigation} setDisable={setDisable} />
         ) : screenIndex == 1 ? (
           <PaymentSegment />
         ) : (
@@ -483,7 +491,7 @@ const CheckoutScreen = ({navigation}) => {
             else navigation.navigate('Home');
           }}
           // disabled={disable}
-          >
+        >
           <View style={styles.button}>
             <Text style={styles.buttonText}>Next</Text>
           </View>

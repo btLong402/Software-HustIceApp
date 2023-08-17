@@ -78,6 +78,9 @@ export const orderSlice = createSlice({
     updateTime: (state, action: PayloadAction<number>) => {
       state.createAt = action.payload;
     },
+    clear : (state) => {
+      state = initialState;
+    }
   },
 });
 
@@ -88,6 +91,7 @@ export const {
   updateOrderLine,
   deleteOrderLine,
   updateTime,
+  clear
 } = orderSlice.actions;
 
 export default orderSlice.reducer;
