@@ -19,6 +19,7 @@ import Seperator from '../../components/Seperator';
 import MasterCardIcon from '../../assets/images/Mastercard_2019_logo.svg';
 import * as yup from 'yup';
 import {Formik, useFormik} from 'formik';
+import { useAppSelector } from '../../redux/hook';
 const cardInputValidationSchema = yup.object().shape({
   cardNumber: yup
     .string()
@@ -470,10 +471,100 @@ const PaymentSegment = () => {
   );
 };
 
+const PriceSegment = () => {
+  const {totalPrice, discount} = useAppSelector(state => state.orderCreate);
+  return (
+    <View style={priceContainer}>
+      <View style={priceRow}>
+        <Text style={localStyles.label}>Subtotal</Text>
+        <Text style={localStyles.value}>{String(totalPrice)} VND</Text>
+      </View>
+      <Spacer height={10} />
+      <View style={priceRow}>
+        <Text style={localStyles.label}>Shipment Fees</Text>
+        <Text style={localStyles.value}>15000 VND </Text>
+      </View>
+      <Spacer height={10} />
+      <View style={priceRow}>
+        <Text style={localStyles.label}>Product Discount</Text>
+        <Text style={localStyles.value}>{String(discount * 100)}%</Text>
+      </View>
+      <Spacer height={10} />
+      <Seperator />
+      <Spacer height={10} />
+      <View style={priceRow}>
+        <Text
+          style={
+            (localStyles.label,
+            {fontSize: 20, fontWeight: 'bold', letterSpacing: 0.9})
+          }>
+          Total
+        </Text>
+        <Text style={localStyles.value}>
+          {String(totalPrice * (1 - discount) + 15000)} VND
+        </Text>
+      </View>
+    </View>
+  );
+};
+const foodContainer = StyleSheet.compose(styles.childContainer, {
+  height: 250
+});
+
+const priceRow = StyleSheet.compose(styles.row, {
+  justifyContent: 'space-between',
+});
+const priceContainer = StyleSheet.compose(styles.childContainer, {
+  flexShrink: 0,
+});
+
+const ProdSegment = () => {
+  const {orderLines} = useAppSelector(state => state.orderCreate);
+  return (
+    <View style={foodContainer}>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {orderLines.map((line: OrderLine, index: number) => {
+          return (
+            <View key={index}>
+              <View style={styles.row}>
+                <Image
+                  style={localStyles.prodImage}
+                  source={{
+                    uri: line.thumbnail,
+                  }}
+                />
+                <View style={localStyles.prodInfo}>
+                  <Text
+                    style={localStyles.prodName}
+                    numberOfLines={1}
+                    ellipsizeMode="tail">
+                    {line.name} x {String(line.quantity)}
+                  </Text>
+                  <Text
+                    style={localStyles.prodDesc}
+                    numberOfLines={1}
+                    ellipsizeMode="tail">
+                    Des:
+                  </Text>
+                  <Text style={localStyles.prodPrice}>
+                    {String(line.subTotal)} VND
+                  </Text>
+                </View>
+              </View>
+              <Spacer height={15} />
+            </View>
+          );
+        })}
+      </ScrollView>
+    </View>
+  );
+};
+
 const SubmitSegment = () => {
   return (
-    <View style={mainContainer}>
-      <Text>SubmitScreen</Text>
+    <View>
+      < ProdSegment />
+      <PriceSegment/>
     </View>
   );
 };
@@ -533,7 +624,8 @@ const CheckoutScreen = ({navigation}) => {
             if (screenIndex < 2) setScreenIndex(screenIndex + 1);
             else navigation.navigate('Home');
           }}
-          disabled={disable}>
+          // disabled={disable}
+          >
           <View style={styles.button}>
             <Text style={styles.buttonText}>Next</Text>
           </View>
@@ -588,6 +680,42 @@ const localStyles = StyleSheet.create({
     shadowRadius: 2,
     marginHorizontal: 5,
     paddingVertical: 5,
+  },
+  prodImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 5,
+    flex: 1,
+  },
+  prodInfo: {
+    paddingLeft: 10,
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    flex: 2,
+  },
+  prodName: {
+    fontSize: 16,
+    fontWeight: '500',
+    opacity: 0.9,
+  },
+  prodDesc: {
+    fontSize: 14,
+    opacity: 0.7,
+  },
+  prodPrice: {
+    fontSize: 18,
+    fontWeight: '500',
+    opacity: 0.9,
+    color: 'crimson',
+  },
+  label: {
+    fontSize: 18,
+    fontWeight: '500',
+    opacity: 0.9,
+  },
+  value: {
+    fontSize: 18,
+    opacity: 0.7,
   },
 });
 export default CheckoutScreen;
