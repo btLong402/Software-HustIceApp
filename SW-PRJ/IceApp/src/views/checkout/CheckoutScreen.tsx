@@ -13,7 +13,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import styles from './styles';
 import Spacer from '../../components/Spacer';
 import Seperator from '../../components/Seperator';
-import MasterCardIcon from '../../assets/images/Mastercard_2019_logo.svg';
+import ShippingSegment from './ShippingSegment';
 
 const Circle = ({
   backgroundColor,
@@ -147,143 +147,6 @@ const ProcessSegment = ({screenIndex, onClick}) => {
             return <Text style={{opacity: 0.9}}>{label}</Text>;
           } else return <Text style={{opacity: 0.3}}>{label}</Text>;
         })}
-      </View>
-    </View>
-  );
-};
-const ShippingSegment = ({navigation}) => {
-  const [isSelected, setIsSelected] = useState(false);
-  const [selectedIndex, setSelectionIndex] = useState(null);
-  const handleClick = index => {
-    if (isSelected === false) {
-      setIsSelected(true);
-      setSelectionIndex(index);
-    } else if (selectedIndex === index) {
-      setIsSelected(false);
-      setSelectionIndex(null);
-    } else if (selectedIndex !== index) {
-      setSelectionIndex(index);
-    }
-  };
-  const shippingCircles = (
-    <View style={{flex: 3}}>
-      <ScrollView>
-        {Array(10)
-          .fill(0)
-          .map((_, index) => {
-            return (
-              <View key={index}>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    width: '90%',
-                  }}>
-                  <View>
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        fontWeight: 500,
-                      }}>
-                      Pickup Point
-                    </Text>
-                    <Spacer height={5} />
-                    <TouchableOpacity style={addressRow}>
-                      <Ionicons name="location" size={20} color="black" />
-                      <Spacer width={10} />
-                      <Text
-                        style={localStyles.address}
-                        numberOfLines={1}
-                        ellipsizeMode="tail">
-                        Hai Ba Trung, Hanoi
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                  <View
-                    style={{
-                      flexDirection: 'column',
-                      justifyContent: 'space-between',
-                    }}>
-                    <Text
-                      style={{
-                        fontSize: 11,
-                      }}>
-                      Free
-                    </Text>
-                    <TouchableOpacity style={{}}>
-                      {isSelected && selectedIndex === index ? (
-                        <Circle
-                          backgroundColor={'crimson'}
-                          text="✓"
-                          textColor={'white'}
-                          onClick={handleClick.bind(null, index)}
-                        />
-                      ) : (
-                        <Circle
-                          backgroundColor={'white'}
-                          borderWidth={1}
-                          onClick={handleClick.bind(null, index)}
-                        />
-                      )}
-                    </TouchableOpacity>
-                  </View>
-                </View>
-                <Spacer height={10} />
-                <Seperator />
-                <Spacer height={10} />
-              </View>
-            );
-          })}
-      </ScrollView>
-    </View>
-  );
-
-  return (
-    <View style={mainContainer}>
-      <Text style={localStyles.header}>Shipping Address</Text>
-      <Spacer height={20} />
-      <View
-        style={{
-          paddingLeft: 10,
-          flex: 1,
-          alignItems: 'center',
-        }}>
-        {shippingCircles}
-        <Spacer height={20} />
-        <TouchableOpacity
-          style={{
-            flex: 1,
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderColor: 'crimson',
-            borderWidth: 2,
-            borderRadius: 20,
-            paddingVertical: 10,
-            width: '80%',
-            opacity: 0.9,
-            borderStyle: 'dashed',
-          }}
-          onPress={() => {
-            navigation.navigate('Map Screen');
-          }}>
-          <Ionicons
-            name="add-circle-outline"
-            size={50}
-            color="black"
-            style={{
-              opacity: 0.8,
-            }}
-          />
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: '500',
-            }}>
-            Add New Address
-          </Text>
-        </TouchableOpacity>
-        <Spacer height={10} />
       </View>
     </View>
   );
@@ -433,11 +296,11 @@ const addressRow = StyleSheet.compose(styles.row, {
   alignItems: 'center',
 });
 
-const mainContainer = StyleSheet.compose(styles.childContainer, {
+export const mainContainer = StyleSheet.compose(styles.childContainer, {
   flex: 1,
   minHeight: 200,
 });
-const localStyles = StyleSheet.create({
+export const localStyles = StyleSheet.create({
   mainContainer: {
     flexDirection: 'column',
   },
