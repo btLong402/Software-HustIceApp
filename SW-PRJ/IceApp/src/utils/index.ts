@@ -13,13 +13,14 @@ export const getData = (
   return categoryList.map((category: Category) => {
     const products: Choose[] = productList
       .filter((product: Product) =>
-        product.category.some(cat => cat.title === category.title),
+        product.category.some(cat => {
+          let t = cat.title === category.title
+          return t;
+        }),
       )
       .map((product: Product) => {
         const productSizes = sizeList.filter(size =>
-          product.sizeList.some(ps => 
-            ps.sizeId === size.sizeId
-          ),
+          product.sizeList.some(ps => ps.sizeId === size.sizeId),
         );
         const productToppings = toppingList.filter(topping =>
           product.toppingList.some(pt => pt.toppingId === topping.toppingId),

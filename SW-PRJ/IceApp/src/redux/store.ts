@@ -6,6 +6,7 @@ import toppingSlice from './topping/toppingSlice';
 import sizeSlice from './size/sizeSlice';
 import categorySlice from './category/categorySlice';
 import orderLineSlice from './order/orderSupportSlice';
+import dataSLice  from './Data/dataSlice';
 export const store = configureStore({
   reducer: {
     orderCreate: orderSlice,
@@ -14,6 +15,7 @@ export const store = configureStore({
     sizeList: sizeSlice,
     categoryList: categorySlice,
     orderLine: orderLineSlice,
+    data: dataSLice,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({

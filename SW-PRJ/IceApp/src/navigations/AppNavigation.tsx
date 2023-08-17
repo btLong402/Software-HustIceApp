@@ -6,7 +6,7 @@
  * @format
  */
 
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import MainScreen from '../views/main_page';
 import MeScreen from '../views/profile/MeScreen';
 import {Badge, Box} from 'native-base';
@@ -46,7 +46,6 @@ import {
 import {useAppDispatch, useAppSelector} from '../redux/hook';
 import {delay} from '@reduxjs/toolkit/dist/utils';
 import { TurboModuleRegistry } from 'react-native';
-
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
@@ -87,7 +86,6 @@ function AppNavigation(): JSX.Element {
       return false;
     }
   };
-
   const loadProductData = () => {
     Promise.all([
       getAllProducts(),
@@ -155,7 +153,7 @@ function AppNavigation(): JSX.Element {
             }),
           );
         });
-      })
+      }).then((_) => setTimeout(() =>{setIsLoading(false)}, 3000))
       .catch(error => {
         console.log(error);
       });
@@ -178,7 +176,6 @@ function AppNavigation(): JSX.Element {
       setIsLoading(true);
       await loadAuthInfo();
       await loadProductData();
-      setIsLoading(false);
     };
     initLoad();
   }, [isSignout]);
@@ -195,7 +192,6 @@ function AppNavigation(): JSX.Element {
     };
     loadUserInfo();
   }, [_id, isSignout]);
-
   return isLoading ? (
     <Splash />
   ) : (
