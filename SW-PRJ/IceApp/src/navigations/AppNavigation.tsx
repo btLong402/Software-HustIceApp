@@ -7,7 +7,6 @@
  */
 
 import React, {useEffect} from 'react';
-import MainScreen from '../views/main_page';
 import MeScreen from '../views/profile/MeScreen';
 import {Badge, Box} from 'native-base';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
@@ -27,6 +26,7 @@ import ProfileScreen from '../views/profile/ProfileScreen';
 import MainPage from '../views/main_page/MainPage';
 import Test from '../views/main_page/Test';
 import Search from '../views/main_page/component/pages/Search';
+import MapScreen from '../views/checkout/MapScreen';
 
 import AccountSetting from '../views/AccountSetting';
 import {useUser} from '../context/userContext';
@@ -44,8 +44,7 @@ import {
   getAllSize,
 } from '../services/product-api';
 import {useAppDispatch, useAppSelector} from '../redux/hook';
-import {delay} from '@reduxjs/toolkit/dist/utils';
-import { TurboModuleRegistry } from 'react-native';
+import ResetPassword from '../views/authentication/ResetPasswordScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -192,7 +191,6 @@ function AppNavigation(): JSX.Element {
       setIsLoading(false);
     };
     initLoad();
-    
   }, []);
 
   useEffect(() => {
@@ -224,6 +222,7 @@ function AppNavigation(): JSX.Element {
             <Stack.Screen name="SignUp" component={SignUp} />
             <Stack.Screen name="Test" component={Test} />
             <Stack.Screen name="Search" component={Search} />
+            <Stack.Screen name="ResetPassword" component={ResetPassword} />
           </>
         ) : (
           <>
@@ -239,6 +238,7 @@ function AppNavigation(): JSX.Element {
             <Stack.Screen name="Checkout" component={CheckoutScreen} />
             <Stack.Screen name="Profile" component={ProfileScreen} />
             <Stack.Screen name="Account Setting" component={AccountSetting} />
+            <Stack.Screen name="Map Screen" component={MapScreen} />
           </>
         )}
       </Stack.Navigator>

@@ -77,6 +77,7 @@ const SignUp = ({navigation}: any) => {
     if (mess?.type) {
       toast.show({
         placement: 'top',
+        duration: mess.type === 'success' ? 1000 : 2000,
         render: () => {
           return (
             <Box
@@ -96,15 +97,13 @@ const SignUp = ({navigation}: any) => {
   }, [mess]);
 
   const scrollViewRef = useRef();
-  const handleSubmit = async () => {
-    await authService.register({});
-  };
+
   return (
     <ScrollView
       ref={scrollViewRef}
       onContentSizeChange={() => {
         if (!isOpen) {
-          scrollViewRef.current.scrollToEnd({animated: true});
+          scrollViewRef?.current.scrollToEnd({animated: true});
           isOpen = true;
         }
       }}>

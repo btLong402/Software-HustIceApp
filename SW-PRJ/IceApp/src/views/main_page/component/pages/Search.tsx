@@ -17,6 +17,7 @@ import {useAppSelector} from '../../../../redux/hook';
 import {Product} from '../../../../redux/product/productSlice';
 import {IconButton} from '@react-native-material/core';
 import Icon from 'react-native-vector-icons/AntDesign';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 type RenderItemProps = {
   name: string;
   thumbnail: string;
@@ -60,6 +61,34 @@ export default function Search({navigation}: any) {
       setFilter([]);
     }
   };
+
+  useEffect(() => {
+    const headerLeft = () => (
+      <Ionicons
+        name="arrow-back"
+        size={30}
+        color="white"
+        style={{marginLeft: 10}}
+        onPress={() => {
+          navigation.goBack();
+        }}
+      />
+    );
+    navigation.setOptions({
+      title: 'Search',
+      headerLeft: headerLeft,
+      headerTintColor: 'white',
+      headerStyle: {
+        backgroundColor: 'crimson',
+      },
+      headerTitleStyle: {
+        fontSize: 20, // set the font size of the header title to 20
+        fontWeight: 500, // set the font weight of the header title to bold
+        letterSpacing: 1, // set the letter spacing to 0.5
+      },
+    });
+  }, []);
+
   useEffect(() => {
     const timeoutId = setTimeout(filterData, 300);
     return () => clearTimeout(timeoutId);

@@ -103,12 +103,12 @@ const ProfileScreen = ({route, navigation}) => {
       cropping: true,
     })
       .then(image => {
-        // console.log({
-        //   uri: image.path,
-        //   type: image.mime,
-        //   name: image.filename,
-        //   size: image.size,
-        // });
+        console.log({
+          uri: image.path,
+          type: image.mime,
+          name: image.filename,
+          size: image.size,
+        });
         setVisible(false);
         setUserProfileState(previousState => ({
           ...previousState,

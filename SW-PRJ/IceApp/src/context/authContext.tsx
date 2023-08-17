@@ -14,6 +14,7 @@ const initState: AuthState = {
   isSignout: null,
   _id: null,
   mess: null,
+  setMess: mess => {},
 };
 
 const AuthContext = React.createContext(initState);
@@ -77,7 +78,7 @@ export const AuthProvider = ({children}: any) => {
 
   const authContext: AuthContextProps = React.useMemo(
     () => ({
-      setMess: mess => {
+      setMess: (mess: string) => {
         dispatch({
           type: AuthActionType.SET_MESS,
           mess,

@@ -46,6 +46,7 @@ const PriceSegment = () => {
     </View>
   );
 };
+
 const ProdSegment = () => {
   return (
     <View style={foodContainer}>
@@ -87,7 +88,7 @@ const ProdSegment = () => {
   );
 };
 
-const CheckoutScreen = ({navigation}) => {
+const CartScreen = ({navigation}) => {
   useEffect(() => {
     const headerLeft = () => (
       <Ionicons
@@ -186,4 +187,4 @@ const foodContainer = StyleSheet.compose(styles.childContainer, {
   flex: 3,
 });
 
-export default CheckoutScreen;
+export default CartScreen;

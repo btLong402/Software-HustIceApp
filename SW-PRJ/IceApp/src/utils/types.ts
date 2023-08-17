@@ -14,6 +14,7 @@ export interface AuthState {
     type: string;
     message: string;
   } | null;
+  setMess: (mess: string) => void;
 }
 export interface RegisterResponse {
   status: string;

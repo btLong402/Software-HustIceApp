@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>847425646681-46mtll8bfd6uijoqiac26r6eijfpchfs.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.847425646681-46mtll8bfd6uijoqiac26r6eijfpchfs</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCoZiFfB-XYhHFiy6iU387fPzB2VvXUs-k</string>
+	<key>GCM_SENDER_ID</key>
+	<string>847425646681</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>org.reactjs.native.example.IceApp</string>
+	<key>PROJECT_ID</key>
+	<string>sweproj-40f37</string>
+	<key>STORAGE_BUCKET</key>
+	<string>sweproj-40f37.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:847425646681:ios:32bcb5d754ed1aad498148</string>
+</dict>
+</plist>

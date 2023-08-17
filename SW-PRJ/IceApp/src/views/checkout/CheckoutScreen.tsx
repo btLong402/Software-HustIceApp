@@ -14,6 +14,7 @@ import styles from './styles';
 import Spacer from '../../components/Spacer';
 import Seperator from '../../components/Seperator';
 import MasterCardIcon from '../../assets/images/Mastercard_2019_logo.svg';
+
 const Circle = ({
   backgroundColor,
   borderWidth = 0,
@@ -150,7 +151,7 @@ const ProcessSegment = ({screenIndex, onClick}) => {
     </View>
   );
 };
-const ShippingSegment = () => {
+const ShippingSegment = ({navigation}) => {
   const [isSelected, setIsSelected] = useState(false);
   const [selectedIndex, setSelectionIndex] = useState(null);
   const handleClick = index => {
@@ -262,6 +263,9 @@ const ShippingSegment = () => {
             width: '80%',
             opacity: 0.9,
             borderStyle: 'dashed',
+          }}
+          onPress={() => {
+            navigation.navigate('Map Screen');
           }}>
           <Ionicons
             name="add-circle-outline"
@@ -402,7 +406,7 @@ const CheckoutScreen = ({navigation}) => {
         />
         <Spacer height={30} />
         {screenIndex === 0 ? (
-          <ShippingSegment />
+          <ShippingSegment navigation={navigation} />
         ) : screenIndex == 1 ? (
           <PaymentSegment />
         ) : (
