@@ -77,6 +77,7 @@ const SignUp = ({navigation}: any) => {
     if (mess?.type) {
       toast.show({
         placement: 'top',
+        duration: mess.type === 'success' ? 1000 : 2000,
         render: () => {
           return (
             <Box
@@ -105,6 +106,7 @@ const SignUp = ({navigation}: any) => {
       setIsOpen(true);
     }
   };
+  
   return (
     <ScrollView
       ref={scrollViewRef}

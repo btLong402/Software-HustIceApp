@@ -1,11 +1,12 @@
+
 # Resolve react_native_pods.rb with node to allow for hoisting
 require Pod::Executable.execute_command('node', ['-p',
   'require.resolve(
     "react-native/scripts/react_native_pods.rb",
     {paths: [process.argv[1]]},
   )', __dir__]).strip
-
-platform :ios, min_ios_version_supported
+  platform :ios, '13.0'
+# platform :ios, min_ios_version_supported
 prepare_react_native_project!
 
 # If you are using a `react-native-flipper` your iOS build will fail when `NO_FLIPPER=1` is set.
@@ -38,12 +39,23 @@ target 'IceApp' do
   # # The following line uses react-native-restart, linking with
   # # the library and setting the Header Search Paths for you
   # pod 'react-native-restart', :path => '../node_modules/react-native-restart'
-
+  
+  # React Native Maps dependencies
+  # The following line is only needed if building on an Apple silicon Mac without rosetta.
   config = use_native_modules!
-
+  # use_frameworks! :linkage => :static
+  # $RNFirebaseAsStaticFramework = true
+  # use_frameworks!
+  # React Native Maps dependencies
+  # The following line is only needed if building on an Apple silicon Mac without rosetta.
+  pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/glog.podspec', :modular_headers => false
+  pod 'GoogleMaps'
+  pod 'Google-Maps-iOS-Utils', :git => 'https://github.com/Simon-TechForm/google-maps-ios-utils.git', :branch => 'feat/support-apple-silicon'
+  rn_maps_path = '../node_modules/react-native-maps'
+  pod 'react-native-google-maps', :path => rn_maps_path
   # Flags change depending on the env values.
   flags = get_default_flags()
-
+  use_modular_headers!
   use_react_native!(
     :path => config[:reactNativePath],
     # Hermes is now enabled by default. Disable by setting this flag to false.
@@ -53,7 +65,7 @@ target 'IceApp' do
     #
     # Note that if you have use_frameworks! enabled, Flipper will not work and
     # you should disable the next line.
-    :flipper_configuration => flipper_config,
+    # :flipper_configuration => flipper_config,
     # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/.."
 

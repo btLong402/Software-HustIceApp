@@ -26,6 +26,7 @@ import ProfileScreen from '../views/profile/ProfileScreen';
 import MainPage from '../views/main_page/MainPage';
 import Test from '../views/main_page/Test';
 import Search from '../views/main_page/component/pages/Search';
+import MapScreen from '../views/checkout/MapScreen';
 
 import AccountSetting from '../views/AccountSetting';
 import {useUser} from '../context/userContext';
@@ -43,6 +44,8 @@ import {
   getAllSize,
 } from '../services/product-api';
 import {useAppDispatch, useAppSelector} from '../redux/hook';
+import ResetPassword from '../views/authentication/ResetPasswordScreen';
+
 import {delay} from '@reduxjs/toolkit/dist/utils';
 import { TurboModuleRegistry } from 'react-native';
 const Tab = createBottomTabNavigator();
@@ -56,12 +59,7 @@ function AppNavigation(): JSX.Element {
     USER_REDUCER_TYPE,
     dispatch: userDispatch,
   } = useUser();
-  // console.log('user', user);
 
-  // console.log('token', token);
-  // console.log('_id', _id);
-  // console.log('isSignout', isSignout);
-  // console.log('products', products);
 
   const productDispatch = useAppDispatch();
 
@@ -211,6 +209,7 @@ function AppNavigation(): JSX.Element {
               options={{headerShown: false}}
             />
             <Stack.Screen name="Search" component={Search} />
+            <Stack.Screen name="ResetPassword" component={ResetPassword} />
           </>
         ) : (
           <>
@@ -230,6 +229,7 @@ function AppNavigation(): JSX.Element {
             <Stack.Screen name="Checkout" component={CheckoutScreen} />
             <Stack.Screen name="Profile" component={ProfileScreen} />
             <Stack.Screen name="Account Setting" component={AccountSetting} />
+            <Stack.Screen name="Map Screen" component={MapScreen} />
           </>
         )}
       </Stack.Navigator>

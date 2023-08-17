@@ -50,6 +50,7 @@ const PriceSegment = () => {
     </View>
   );
 };
+
 const ProdSegment = () => {
   const {orderLines} = useAppSelector(state => state.orderCreate);
   return (
@@ -91,7 +92,7 @@ const ProdSegment = () => {
   );
 };
 
-const CheckoutScreen = ({navigation} : any) => {
+const CartScreen = ({navigation}) => {
   useEffect(() => {
     const headerLeft = () => (
       <Ionicons
@@ -190,4 +191,4 @@ const foodContainer = StyleSheet.compose(styles.childContainer, {
   flex: 3,
 });
 
-export default CheckoutScreen;
+export default CartScreen;

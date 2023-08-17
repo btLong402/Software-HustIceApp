@@ -59,7 +59,7 @@ const SignIn = ({navigation}) => {
     if (mess?.type) {
       toast.show({
         placement: 'top',
-        duration: 2000,
+        duration: mess.type === 'success' ? 1000 : 2000,
         render: () => {
           return (
             <Box
@@ -73,7 +73,6 @@ const SignIn = ({navigation}) => {
           );
         },
       });
-      mess?.type === 'success' && setTimeout(() => navigation.goBack(), 0);
       setMess(null);
     }
   }, [mess]);
@@ -107,7 +106,7 @@ const SignIn = ({navigation}) => {
           }) => {
             const isDisabled =
               !isValid ||
-              (Object.keys(touched).length === 0 &&
+              (Object.keys(touched).length === 0 && 
                 touched.constructor === Object);
             return (
               <>
@@ -121,9 +120,6 @@ const SignIn = ({navigation}) => {
                       value={values.phoneNumber}
                     />
                   </View>
-                  {/* {errors.phoneNumber &&
-                  touched.phoneNumber &&
-                  showToastError(errors.phoneNumber)} */}
                   <View style={styles.input_border}>
                     <TextInput
                       style={styles.input}
@@ -134,15 +130,9 @@ const SignIn = ({navigation}) => {
                       value={values.password}
                     />
                   </View>
-                  {/* {errors.password && touched.password && (
-                  <Text
-                    style={StyleSheet.compose(styles.input_border, {
-                      color: 'red',
-                    })}>
-                    {errors.password}
-                  </Text>
-                )} */}
-                  <TouchableOpacity style={styles.forgot_password}>
+                  <TouchableOpacity
+                    style={styles.forgot_password}
+                    onPress={() => navigation.navigate('ResetPassword')}>
                     <Text style={styles.h2}>Forgot Password?</Text>
                   </TouchableOpacity>
                 </View>

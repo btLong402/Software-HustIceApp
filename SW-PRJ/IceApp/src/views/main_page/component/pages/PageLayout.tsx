@@ -4,6 +4,7 @@ import {Image, SafeAreaView, StyleSheet, View, Dimensions} from 'react-native';
 
 import {AppBar, HStack, IconButton} from '@react-native-material/core';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {useAuth} from '../../../../context/authContext';
 type PageProps = {
   children?: React.ReactNode;
   navigation: any;
@@ -12,6 +13,8 @@ type PageProps = {
 const windowHeight = Dimensions.get('window').height;
 const bodyHeight = windowHeight - 70; // Adjust the value as needed
 const Page = (props: PageProps) => {
+  const {isSignout} = useAuth();
+
   const {children, navigation, data} = props;
   return (
     <SafeAreaView>
@@ -36,7 +39,7 @@ const Page = (props: PageProps) => {
                 />
                 <IconButton
                   icon={<Image source={require('../products/cart.png')} />}
-                  onPress={() => navigation.push('Cart')}
+                  onPress={() => !isSignout ? navigation.navigate('Cart') : navigation.navigate('SignIn')}
                 />
               </HStack>
             }
