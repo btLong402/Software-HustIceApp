@@ -8,13 +8,14 @@ import {
 } from 'react-native';
 import React, {useEffect} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import {IconButton} from '@react-native-material/core';
 import Spacer from '../../components/Spacer';
 import Seperator from '../../components/Seperator';
 import styles from './styles';
 import {Image} from 'react-native';
-import { useAppSelector } from '../../redux/hook';
-import { OrderLine } from '../../redux/order/orderSlice';
-
+import { useAppDispatch, useAppSelector } from '../../redux/hook';
+import {OrderLine, deleteOrderLine} from '../../redux/order/orderSlice';
+import Icon from 'react-native-vector-icons/AntDesign';
 const PriceSegment = () => {
   const {totalPrice, discount} = useAppSelector(state => state.orderCreate)
   return (
@@ -52,6 +53,7 @@ const PriceSegment = () => {
 
 const ProdSegment = () => {
   const {orderLines} = useAppSelector(state => state.orderCreate);
+  const dispatch = useAppDispatch();
   return (
     <View style={foodContainer}>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -77,10 +79,16 @@ const ProdSegment = () => {
                       style={localStyles.prodDesc}
                       numberOfLines={1}
                       ellipsizeMode="tail">
-                        Des:
+                      Des:
                     </Text>
-                    <Text style={localStyles.prodPrice}>{String(line.subTotal)} VND</Text>
+                    <Text style={localStyles.prodPrice}>
+                      {String(line.subTotal)} VND
+                    </Text>
                   </View>
+                  <IconButton
+                    icon={<Icon name="minus" size={16} color="red" />}
+                    onPress={() => dispatch(deleteOrderLine({productId : line.productId}))}
+                  />
                 </View>
                 <Spacer height={15} />
               </View>
