@@ -6,7 +6,7 @@
  * @format
  */
 
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import MeScreen from '../views/profile/MeScreen';
 import {Badge, Box} from 'native-base';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
@@ -46,6 +46,8 @@ import {
 import {useAppDispatch, useAppSelector} from '../redux/hook';
 import ResetPassword from '../views/authentication/ResetPasswordScreen';
 
+import {delay} from '@reduxjs/toolkit/dist/utils';
+import { TurboModuleRegistry } from 'react-native';
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
@@ -57,13 +59,7 @@ function AppNavigation(): JSX.Element {
     USER_REDUCER_TYPE,
     dispatch: userDispatch,
   } = useUser();
-  const products = useAppSelector(state => state.productList);
-  console.log('user', user);
 
-  // console.log('token', token);
-  // console.log('_id', _id);
-  console.log('isSignout', isSignout);
-  console.log('products', products);
 
   const productDispatch = useAppDispatch();
 
@@ -87,7 +83,6 @@ function AppNavigation(): JSX.Element {
       return false;
     }
   };
-
   const loadProductData = () => {
     Promise.all([
       getAllProducts(),
@@ -111,7 +106,7 @@ function AppNavigation(): JSX.Element {
           });
           product.sizeList.forEach((s: any) => {
             size.push({
-              sizeId: String(s._id),
+              sizeId: String(s.sizeId),
             });
           });
           let newProduct: Product = {
@@ -155,17 +150,10 @@ function AppNavigation(): JSX.Element {
             }),
           );
         });
-      })
+      }).then((_) => setTimeout(() =>{setIsLoading(false)}, 3000))
       .catch(error => {
         console.log(error);
       });
-  };
-
-  const loadUserInfo = async (_id: string) => {
-    const isHaveUserInfo = await getUserInfoStorage();
-    if (!isHaveUserInfo) {
-      await getUserInfo(_id);
-    }
   };
 
   const loadAuthInfo = async () => {
@@ -179,19 +167,15 @@ function AppNavigation(): JSX.Element {
     }
   };
 
-  const delay = (ms: number, resolve: (value?: unknown) => void) =>
-    new Promise(resolve => setTimeout(resolve, ms));
-
   useEffect(() => {
     if (isSignout !== null) return;
     const initLoad = async () => {
       setIsLoading(true);
       await loadAuthInfo();
       await loadProductData();
-      setIsLoading(false);
     };
     initLoad();
-  }, []);
+  }, [isSignout]);
 
   useEffect(() => {
     if (isSignout !== false || !_id) return;
@@ -205,7 +189,6 @@ function AppNavigation(): JSX.Element {
     };
     loadUserInfo();
   }, [_id, isSignout]);
-
   return isLoading ? (
     <Splash />
   ) : (
@@ -220,7 +203,11 @@ function AppNavigation(): JSX.Element {
             />
             <Stack.Screen name="SignIn" component={SignIn} />
             <Stack.Screen name="SignUp" component={SignUp} />
-            <Stack.Screen name="Test" component={Test} />
+            <Stack.Screen
+              name="Test"
+              component={Test}
+              options={{headerShown: false}}
+            />
             <Stack.Screen name="Search" component={Search} />
             <Stack.Screen name="ResetPassword" component={ResetPassword} />
           </>
@@ -231,7 +218,11 @@ function AppNavigation(): JSX.Element {
               component={MainTabs}
               options={{headerShown: false}}
             />
-            <Stack.Screen name="Test" component={Test} />
+            <Stack.Screen
+              name="Test"
+              component={Test}
+              options={{headerShown: false}}
+            />
             <Stack.Screen name="Search" component={Search} />
             <Stack.Screen name="Cart" component={CartScreen} />
             <Stack.Screen name="EditProfile" component={EditProfileScreen} />

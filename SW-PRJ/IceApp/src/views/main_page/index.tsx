@@ -85,7 +85,7 @@ const DataSection = () => {
   );
 };
 
-function MainScreen({navigation}) {
+function MainScreen() {
   return (
     <SafeAreaView>
       <ScrollView style={styles.background}>

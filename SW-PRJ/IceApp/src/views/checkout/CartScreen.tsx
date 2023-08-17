@@ -12,23 +12,25 @@ import Spacer from '../../components/Spacer';
 import Seperator from '../../components/Seperator';
 import styles from './styles';
 import {Image} from 'react-native';
+import { useAppSelector } from '../../redux/hook';
 
 const PriceSegment = () => {
+  const {totalPrice, discount} = useAppSelector(state => state.orderCreate)
   return (
     <View style={priceContainer}>
       <View style={priceRow}>
         <Text style={localStyles.label}>Subtotal</Text>
-        <Text style={localStyles.value}>$100</Text>
+        <Text style={localStyles.value}>{String(totalPrice)} VND</Text>
       </View>
       <Spacer height={10} />
       <View style={priceRow}>
-        <Text style={localStyles.label}>Tax & Fees</Text>
-        <Text style={localStyles.value}>$10</Text>
+        <Text style={localStyles.label}>Shipment Fees</Text>
+        <Text style={localStyles.value}>15000 VND </Text>
       </View>
       <Spacer height={10} />
       <View style={priceRow}>
         <Text style={localStyles.label}>Product Discount</Text>
-        <Text style={localStyles.value}>-$0</Text>
+        <Text style={localStyles.value}>{String(discount * 100)}%</Text>
       </View>
       <Spacer height={10} />
       <Seperator />
@@ -41,7 +43,7 @@ const PriceSegment = () => {
           }>
           Total
         </Text>
-        <Text style={localStyles.value}>$ 110</Text>
+        <Text style={localStyles.value}>{String(totalPrice * (1 - discount) + 15000)} VND</Text>
       </View>
     </View>
   );

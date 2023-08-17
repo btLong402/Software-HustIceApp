@@ -113,7 +113,7 @@ export const UserProvider = ({children}: UserProviderProps) => {
 
   const getUserInfo = async (_id: string) => {
     const data = await UserService.getProfile(_id);
-    console.log("user profile: ",data);
+    console.log('user profile: ', data);
     if (data?.status === 'OK') {
       dispatch({type: USER_REDUCER_TYPE.UPDATE_MANY, payload: data?.data});
     }
@@ -134,6 +134,11 @@ export const UserProvider = ({children}: UserProviderProps) => {
       });
     }
   };
+
+  const resetUserInfo = () => {
+    dispatch({type: USER_REDUCER_TYPE.UPDATE_MANY, payload: initState});
+  };
+
   return (
     <UserContext.Provider
       value={{
@@ -143,6 +148,7 @@ export const UserProvider = ({children}: UserProviderProps) => {
         update_mess,
         getUserInfo,
         updateUserInfo,
+        resetUserInfo,
       }}>
       {children}
     </UserContext.Provider>

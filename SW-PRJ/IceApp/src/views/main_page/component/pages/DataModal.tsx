@@ -1,12 +1,8 @@
 /* eslint-disable prettier/prettier */
-export interface Item {
-  productId: string;
-  name: string;
-  basePrice: number;
-  thumbnail: string;
-}
+
+import { Choose } from "../../../../redux/order/orderSupportSlice";
 
 export interface DataSection {
   title: string;
-  products: Item[];
+  products: Choose[];
 }

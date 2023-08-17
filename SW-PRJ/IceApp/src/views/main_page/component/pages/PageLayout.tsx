@@ -8,13 +8,14 @@ import {useAuth} from '../../../../context/authContext';
 type PageProps = {
   children?: React.ReactNode;
   navigation: any;
+  data: any;
 };
 const windowHeight = Dimensions.get('window').height;
 const bodyHeight = windowHeight - 70; // Adjust the value as needed
 const Page = (props: PageProps) => {
   const {isSignout} = useAuth();
 
-  const {children, navigation} = props;
+  const {children, navigation, data} = props;
   return (
     <SafeAreaView>
       <View style={styles.background}>
@@ -34,11 +35,11 @@ const Page = (props: PageProps) => {
                       size={38}
                     />
                   }
-                  onPress={() => navigation.navigate('Search')}
+                  onPress={() => navigation.push('Search', {data: data})}
                 />
                 <IconButton
                   icon={<Image source={require('../products/cart.png')} />}
-                  onPress={() => !isSignout && navigation.navigate('Cart')}
+                  onPress={() => !isSignout ? navigation.navigate('Cart') : navigation.navigate('SignIn')}
                 />
               </HStack>
             }

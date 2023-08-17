@@ -4,9 +4,10 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useAuth} from '../context/authContext';
 import {Box, Text} from 'native-base';
 import {TouchableWithoutFeedback} from 'react-native';
+import {useUser} from '../context/userContext';
 function AccountSetting({navigation}) {
   const {signOut} = useAuth();
-
+  const {resetUserInfo} = useUser();
   useLayoutEffect(() => {
     const headerLeft = () => (
       <Ionicons
@@ -38,6 +39,7 @@ function AccountSetting({navigation}) {
     <TouchableWithoutFeedback
       onPress={async () => {
         await signOut();
+        resetUserInfo();
       }}>
       <Box
         marginTop={10}

@@ -1,39 +1,39 @@
 /* eslint-disable prettier/prettier */
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {StyleSheet, Text, View, Pressable} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useAppDispatch} from '../../redux/hook';
-import {addNewTopping, deleteTopping} from '../../redux/order/orderSlice';
+import {addNewTopping, deleteTopping} from '../../redux/order/orderSupportSlice';
+import { Topping } from '../../redux/topping/toppingSlice';
 type RenderDataProps = {
   data: Array<{
-    itemId: number;
+    topping: Topping;
     itemName: string;
     isChecked: boolean;
   }>;
-  productId: number;
 };
 
 const RenderData = (props: RenderDataProps) => {
-  const {data, productId} = props;
+  const {data} = props;
   const dispatch = useAppDispatch();
   const [toppingList, setToppingList] = useState<
     Array<{
-      itemId: number;
+      topping: Topping;
       itemName: string;
       isChecked: boolean;
     }>
   >(data);
   const handlePress = (_item: {
-    itemId: number;
+    topping: Topping;
     itemName: string;
     isChecked: boolean;
   }) => {
     if (_item.isChecked) {
-      dispatch(deleteTopping({productId: productId, toppingId: _item.itemId}));
+      dispatch(deleteTopping(_item.topping));
     } else {
-      dispatch(addNewTopping({productId: productId, toppingId: _item.itemId}));
+      dispatch(addNewTopping(_item.topping));
     }
-    const index = toppingList.findIndex((t) => t.itemId === _item.itemId);
+    const index = toppingList.findIndex(t => t.topping.toppingId === _item.topping.toppingId);
     let temp = !toppingList[index].isChecked;
     const newToppingList = [...toppingList];
     newToppingList[index].isChecked = temp;
@@ -41,40 +41,47 @@ const RenderData = (props: RenderDataProps) => {
   };
   return (
     <View>
-      {toppingList.map((_item: any) => (
-        <View key={_item.itemId} style={styles.card}>
-          <Pressable onPress={() => handlePress(_item)} style={styles.row}>
-            <Icon
-              name={
-                _item.isChecked ? 'checkbox-marked' : 'checkbox-blank-outline'
-              }
-              size={24}
-              color="gray"
+      {toppingList.map(
+        (_item: {topping: Topping; itemName: string; isChecked: boolean}) => (
+          <View key={_item.topping.toppingId} style={styles.card}>
+            <Pressable onPress={() => handlePress(_item)} style={styles.row}>
+              <Icon
+                name={
+                  _item.isChecked ? 'checkbox-marked' : 'checkbox-blank-outline'
+                }
+                size={24}
+                color="gray"
               />
               <Text style={styles.h1}>{_item.itemName}</Text>
-          </Pressable>
-        </View>
-      ))}
+            </Pressable>
+          </View>
+        ),
+      )}
     </View>
   );
 };
 
 type MultiCheckBoxProps = {
   title: string;
-  data: Array<{
-    itemId: number;
-    itemName: string;
-    isChecked: boolean;
-  }>;
-  productId: number;
+  data: Topping[];
+  productId: string;
 };
 
 export default function MultiCheckBox(props: MultiCheckBoxProps) {
   const {title, data, productId} = props;
+  const newData: Array<{
+    topping: Topping;
+    itemName: string;
+    isChecked: boolean;
+  }> = data.map(d => ({
+    topping: d,
+    itemName: `${d.name} + ${d.price} VND`,
+    isChecked: false,
+  }));
   return (
     <View>
       <Text style={styles.title}>{title}</Text>
-      <RenderData data={data} productId={productId} />
+      <RenderData data={newData}/>
     </View>
   );
 }
@@ -88,8 +95,12 @@ const styles = StyleSheet.create({
     marginRight: 10,
     padding: 10,
   },
-  title: {},
-  row:{
+  title: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#5E5959',
+  },
+  row: {
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
@@ -97,6 +108,6 @@ const styles = StyleSheet.create({
   h1: {
     fontWeight: 'bold',
     color: 'black',
-    marginLeft: 4
-  }
+    marginLeft: 4,
+  },
 });
