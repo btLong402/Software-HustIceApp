@@ -7,13 +7,33 @@ import {
   Image,
   TextInput,
   ScrollView,
+  Button,
+  Alert,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import styles from './styles';
 import Spacer from '../../components/Spacer';
 import Seperator from '../../components/Seperator';
 import MasterCardIcon from '../../assets/images/Mastercard_2019_logo.svg';
+import * as yup from 'yup';
+import {Formik, useFormik} from 'formik';
+const cardInputValidationSchema = yup.object().shape({
+  cardNumber: yup
+    .string()
+    .matches(/^\d{16}$/, 'Số thẻ tín dụng phải có 16 chữ số')
+    .required('Số thẻ tín dụng là bắt buộc'),
+  cardholderName: yup.string().required('Tên chủ thẻ là bắt buộc'),
+  expirationDate: yup
+    .string()
+    .matches(/^(0[1-9]|1[0-2])\/\d{2}$/, 'Ngày hết hạn không hợp lệ')
+    .required('Ngày hết hạn là bắt buộc'),
+  cvv: yup
+    .string()
+    .matches(/^\d{3,4}$/, 'Mã CVV không hợp lệ')
+    .required('Mã CVV là bắt buộc'),
+});
 
 const Circle = ({
   backgroundColor,
@@ -151,7 +171,14 @@ const ProcessSegment = ({screenIndex, onClick}) => {
     </View>
   );
 };
-const ShippingSegment = ({navigation}) => {
+type Shipping = {
+  navigation: any;
+  setDisable : (boolean) => void;
+}
+const ShippingSegment = (props : Shipping) => {
+  const {navigation, setDisable} = props;
+  // setDisable(false);
+  setDisable(true);
   const [isSelected, setIsSelected] = useState(false);
   const [selectedIndex, setSelectionIndex] = useState(null);
   const handleClick = index => {
@@ -309,15 +336,30 @@ const PaymentInputTitle = ({title}) => {
   );
 };
 
-const PaymentInput = ({title}) => {
+const CardForm = () => {
+  const formik = useFormik({
+    initialValues: {
+      cardNumber: '',
+      cardholderName: '',
+      expirationDate: '',
+      cvv: '',
+    },
+    validationSchema: cardInputValidationSchema,
+    onSubmit: values => {
+      Alert.alert(JSON.stringify(values, null, 2));
+    },
+  });
+
   return (
     <View>
       <Spacer height={10} />
-      <PaymentInputTitle title={title} />
+      <PaymentInputTitle title={'Card Number'} />
       <Spacer height={5} />
       <TextInput
-        placeholder="Card Number"
-        // leftIcon={<Ionicons name="card-outline" size={24} color="black" />}
+        placeholder="Số thẻ tín dụng"
+        onChangeText={formik.handleChange('cardNumber')}
+        onBlur={formik.handleBlur('cardNumber')}
+        value={formik.values.cardNumber}
         style={{
           fontSize: 16,
           paddingVertical: 15,
@@ -326,9 +368,88 @@ const PaymentInput = ({title}) => {
         }}
       />
       <Spacer height={5} />
+      {formik.touched.cardNumber && formik.errors.cardNumber && (
+        <View style={styles.row}>
+          <Icon name="error-outline" color={'red'} />
+          <Text style={styles.errors}>{formik.errors.cardNumber}</Text>
+        </View>
+      )}
+      <View style={StyleSheet.compose(styles.row, styles.jusitfyBetween)}>
+        <View>
+          <Spacer height={10} />
+          <PaymentInputTitle title={'CVV/CVC'} />
+          <Spacer height={5} />
+          <TextInput
+            placeholder="Mã CVV"
+            onChangeText={formik.handleChange('cvv')}
+            onBlur={formik.handleBlur('cvv')}
+            value={formik.values.cvv}
+            style={{
+              fontSize: 16,
+              paddingVertical: 15,
+              paddingHorizontal: 20,
+              backgroundColor: '#f6f6f6',
+            }}
+          />
+          {formik.touched.cvv && formik.errors.cvv && (
+            <View style={styles.row}>
+              <Icon name="error-outline" color={'red'} />
+              <Text style={styles.errors}>{formik.errors.cvv}</Text>
+            </View>
+          )}
+        </View>
+        <View>
+          <Spacer height={10} />
+          <PaymentInputTitle title={'Expiration Date'} />
+          <Spacer height={5} />
+          <TextInput
+            placeholder="Ngày hết hạn (MM/YY)"
+            onChangeText={formik.handleChange('expirationDate')}
+            onBlur={formik.handleBlur('expirationDate')}
+            value={formik.values.expirationDate}
+            style={{
+              fontSize: 16,
+              paddingVertical: 15,
+              paddingHorizontal: 20,
+              backgroundColor: '#f6f6f6',
+            }}
+          />
+          <Spacer height={5} />
+          {formik.touched.expirationDate && formik.errors.expirationDate && (
+            <View style={styles.row}>
+              <Icon name="error-outline" color={'red'} />
+              <Text style={styles.errors}>{formik.errors.expirationDate}</Text>
+            </View>
+          )}
+        </View>
+      </View>
+      <Spacer height={10} />
+      <PaymentInputTitle title={'Card Holder'} />
+      <Spacer height={5} />
+      <TextInput
+        placeholder="Tên chủ thẻ"
+        onChangeText={formik.handleChange('cardholderName')}
+        onBlur={formik.handleBlur('cardholderName')}
+        value={formik.values.cardholderName}
+        style={{
+          fontSize: 16,  
+          paddingVertical: 15,
+          paddingHorizontal: 20,
+          backgroundColor: '#f6f6f6',
+        }}
+      />
+      <Spacer height={5} />
+
+      {formik.touched.cardholderName && formik.errors.cardholderName && (
+        <View style={styles.row}>
+          <Icon name="error-outline" color={'red'} />
+          <Text style={styles.errors}>{formik.errors.cardholderName}</Text>
+        </View>
+      )}
     </View>
   );
 };
+
 const PaymentSegment = () => {
   return (
     <View style={mainContainer}>
@@ -343,13 +464,7 @@ const PaymentSegment = () => {
       </View>
       <Spacer height={20} />
       <ScrollView>
-        <PaymentInput title="Card Number" />
-        {/* <Spacer height={20} /> */}
-        <View style={StyleSheet.compose(styles.row, styles.jusitfyBetween)}>
-          <PaymentInput title="CVV/CVC" />
-          <PaymentInput title="Expiration Date" />
-        </View>
-        <PaymentInput title="Card Holder Name" />
+        <CardForm />
       </ScrollView>
     </View>
   );
@@ -367,7 +482,7 @@ const CheckoutScreen = ({navigation}) => {
   const handleClickChangeScreen = screenIndex => {
     setScreenIndex(screenIndex);
   };
-
+  const [disable, setDisable] = useState(false);
   useEffect(() => {
     const headerLeft = () => (
       <Ionicons
@@ -406,7 +521,7 @@ const CheckoutScreen = ({navigation}) => {
         />
         <Spacer height={30} />
         {screenIndex === 0 ? (
-          <ShippingSegment navigation={navigation} />
+          <ShippingSegment navigation={navigation}  setDisable={setDisable}/>
         ) : screenIndex == 1 ? (
           <PaymentSegment />
         ) : (
@@ -417,7 +532,8 @@ const CheckoutScreen = ({navigation}) => {
           onPress={() => {
             if (screenIndex < 2) setScreenIndex(screenIndex + 1);
             else navigation.navigate('Home');
-          }}>
+          }}
+          disabled={disable}>
           <View style={styles.button}>
             <Text style={styles.buttonText}>Next</Text>
           </View>
