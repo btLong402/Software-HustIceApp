@@ -65,7 +65,7 @@ function MainPage() {
   const [visible, setVisible] = useState(false);
   return (
     <NativeBaseProvider>
-      <Page navigation={navigation}>
+      <Page navigation={navigation} data={Data}>
         {Data.length > 0 ? (<List data={Data} index={i}/>) : null}
         <Pressable
           onPress={() => setVisible(true)}

@@ -13,10 +13,15 @@ import {
   Pressable,
   FlatList,
 } from 'react-native';
-import {useAppSelector} from '../../../../redux/hook';
+import {useAppSelector, useAppDispatch} from '../../../../redux/hook';
 import {Product} from '../../../../redux/product/productSlice';
 import {IconButton} from '@react-native-material/core';
+import {
+  Choose,
+  createNewOrderLine,
+} from '../../../../redux/order/orderSupportSlice';
 import Icon from 'react-native-vector-icons/AntDesign';
+import {useNavigation} from '@react-navigation/native';
 type RenderItemProps = {
   name: string;
   thumbnail: string;
@@ -43,29 +48,46 @@ const RenderItem = (props: RenderItemProps) => {
   );
 };
 
-export default function Search({navigation}: any) {
+export default function Search({route}: any) {
   const [searchInput, setSearchInput] = useState<string>('');
-  const [filter, setFilter] = useState<Product[]>([]);
+  const navigation = useNavigation();
+  const [filter, setFilter] = useState<Set<Choose>>(new Set());
   const {productList} = useAppSelector(state => state.productList);
+  const {data} = route.params;
+  const dispatch = useAppDispatch();
   const [isSearch, setIsSearch] = useState<boolean>(false);
   const filterData = () => {
-    if (searchInput && productList != null) {
+    if (searchInput && data.length !== 0) {
+      let check: Map<string, boolean> = new Map();
       const filteredItems = productList.filter(item => {
         const itemName = item.name ? item.name.toUpperCase() : '';
         const textInput = searchInput.toUpperCase();
         return itemName.includes(textInput);
       });
-      setFilter(filteredItems);
+      let newFilteredSet: Set<Choose> = new Set();
+      for (let i of filteredItems) {
+        for (let t of data) {
+          for (let m of t.products)
+            if (m.productId === i.productId) {
+              if (check.has(m.productId) === false) {
+                newFilteredSet.add(m);
+                check.set(m.productId, true);
+              }
+            }
+        }
+      }
+      setFilter(newFilteredSet);
     } else {
-      setFilter([]);
+      setFilter(new Set());
     }
   };
   useEffect(() => {
     const timeoutId = setTimeout(filterData, 300);
     return () => clearTimeout(timeoutId);
   }, [searchInput]);
-  const handleClick = () => {
-    navigation.navigate('Test');
+  const handleClick = (p: Choose) => {
+    dispatch(createNewOrderLine(p));
+    navigation.push('Test', {product: p});
   };
   return (
     <SafeAreaView style={{flex: 1}}>
@@ -89,10 +111,10 @@ export default function Search({navigation}: any) {
             }
           }}
         />
-        {filter.length != 0 ? (
+        {filter.size != 0 ? (
           <FlatList
-            data={filter}
-            keyExtractor={(item: Product, index: number) =>
+            data={Array.from(filter)}
+            keyExtractor={(item: Choose, index: number) =>
               item.productId + index
             }
             style={{flexGrow: 0}}
@@ -103,9 +125,9 @@ export default function Search({navigation}: any) {
                 <RenderItem
                   key={item.productId}
                   name={item.name}
-                  thumbnail={item.image}
+                  thumbnail={item.thumbnail}
                   basePrice={item.basePrice}
-                  handleClick={handleClick}
+                  handleClick={() => handleClick(item)}
                 />
               );
             }}
