@@ -13,7 +13,6 @@ import Seperator from '../../components/Seperator';
 import styles from './styles';
 import {Image} from 'react-native';
 import { useAppSelector } from '../../redux/hook';
-import orderLineSlice from '../../redux/order/orderSupportSlice';
 import { OrderLine } from '../../redux/order/orderSlice';
 
 const PriceSegment = () => {
