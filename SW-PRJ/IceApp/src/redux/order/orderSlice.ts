@@ -22,6 +22,15 @@ export interface Order {
   totalPrice: number;
   discount: number;
   createAt: number;
+  shippingInfo: ShippingInfo;
+}
+
+export interface ShippingInfo {
+  receiverName: string | null;
+  phoneNumber: string | null;
+  address: string | null;
+  province: string | null;
+  shippingInstruction: string | null;
 }
 
 const initialState: Order = {
@@ -33,6 +42,13 @@ const initialState: Order = {
   totalPrice: 0,
   discount: 0,
   createAt: 0,
+  shippingInfo: {
+    receiverName: null,
+    phoneNumber: null,
+    address: null,
+    province: null,
+    shippingInstruction: null,
+  },
 };
 
 export const orderSlice = createSlice({
@@ -78,6 +94,9 @@ export const orderSlice = createSlice({
     updateTime: (state, action: PayloadAction<number>) => {
       state.createAt = action.payload;
     },
+    updateShippingInfo: (state, action: PayloadAction<ShippingInfo>) => {
+      state.shippingInfo = action.payload;
+    },
   },
 });
 
@@ -87,6 +106,7 @@ export const {
   updateNote,
   updateOrderLine,
   deleteOrderLine,
+  updateShippingInfo,
   updateTime,
 } = orderSlice.actions;
 

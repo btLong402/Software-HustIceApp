@@ -14,24 +14,16 @@ import {Formik} from 'formik';
 import * as Yup from 'yup';
 import {useUser} from '../../context/userContext';
 import React, {useState} from 'react';
-
+import {useAppDispatch} from '../../redux/hook';
+import {updateShippingInfo} from '../../redux/order/orderSlice';
 type Shipping = {
   navigation: any;
   setDisable: (boolean) => void;
+  shippingInfo: any;
+  handleShippingInfo: any;
 };
 
-const ShippingForm = ({userInfo}) => {
-  const [selectedLanguage, setSelectedLanguage] = useState();
-
-  console.log('userInfo, ', userInfo);
-  const initialValues = {
-    receiverName: userInfo.fullname,
-    phoneNumber: userInfo.phoneNumber,
-    province: '',
-    address: '',
-    shippingInstruction: '',
-  };
-
+const ShippingForm = ({shippingInfo, handleShippingInfo}) => {
   const validationSchema = Yup.object().shape({
     receiverName: Yup.string().required('Receiver name is required'),
     phoneNumber: Yup.string()
@@ -48,29 +40,26 @@ const ShippingForm = ({userInfo}) => {
     // Handle form submission logic here
     console.log(values);
   };
-  const [service, setService] = React.useState('');
+
+  console.log('shippingInfo: ', shippingInfo);
 
   return (
     <View style={styles.container}>
       <Formik
-        initialValues={initialValues}
+        initialValues={shippingInfo}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}>
-        {({
-          handleChange,
-          handleBlur,
-          handleSubmit,
-          values,
-          errors,
-          touched,
-        }) => (
+        {({handleChange, handleBlur, values, errors, touched}) => (
           // <ScrollView showsVerticalScrollIndicator={false}>
           <View>
             <Text style={styles.label}>Contact</Text>
             <TextInput
               style={styles.input}
               placeholder="Receiver Name"
-              onChangeText={handleChange('receiverName')}
+              onChangeText={value => {
+                handleChange('receiverName')(value);
+                handleShippingInfo('receiverName', value);
+              }}
               onBlur={handleBlur('receiverName')}
               value={values.receiverName}
             />
@@ -81,7 +70,10 @@ const ShippingForm = ({userInfo}) => {
             <TextInput
               style={styles.input}
               placeholder="Phone Number"
-              onChangeText={handleChange('phoneNumber')}
+              onChangeText={value => {
+                handleChange('phoneNumber')(value);
+                handleShippingInfo('phoneNumber', values.phoneNumber);
+              }}
               onBlur={handleBlur('phoneNumber')}
               value={values.phoneNumber}
             />
@@ -106,7 +98,10 @@ const ShippingForm = ({userInfo}) => {
             <TextInput
               style={styles.input}
               placeholder="Address"
-              onChangeText={handleChange('address')}
+              onChangeText={value => {
+                handleChange('address')(value);
+                handleShippingInfo('address', values.address);
+              }}
               onBlur={handleBlur('address')}
               value={values.address}
             />
@@ -129,9 +124,10 @@ const ShippingForm = ({userInfo}) => {
                   fontSize: 15,
                 }}
                 mt={1}
-                onValueChange={itemValue =>
-                  handleChange('shippingInstruction')(itemValue)
-                }>
+                onValueChange={itemValue => {
+                  handleChange('shippingInstruction')(itemValue);
+                  handleShippingInfo('shippingInstruction', itemValue);
+                }}>
                 <Select.Item label="Pick up" value="Pick up" />
                 <Select.Item label="Delivery" value="Delivery" />
               </Select>
@@ -139,8 +135,6 @@ const ShippingForm = ({userInfo}) => {
                 <Text style={styles.error}>{errors.shippingInstruction}</Text>
               )}
             </Box>
-
-            {/* <Button onPress={handleSubmit} title="Submit" /> */}
           </View>
         )}
       </Formik>
@@ -149,8 +143,7 @@ const ShippingForm = ({userInfo}) => {
 };
 
 const ShippingSegment = (props: Shipping) => {
-  const {user: userInfo} = useUser();
-
+  console.log('shippingInfo: ', props.shippingInfo);
   return (
     <View style={mainContainer}>
       <Text style={localStyles.header}>Shipping Address</Text>
@@ -161,7 +154,10 @@ const ShippingSegment = (props: Shipping) => {
           flex: 1,
           alignItems: 'center',
         }}>
-        <ShippingForm userInfo={userInfo} />
+        <ShippingForm
+          shippingInfo={props.shippingInfo}
+          handleShippingInfo={props.handleShippingInfo}
+        />
         <Spacer height={20} />
       </View>
     </View>

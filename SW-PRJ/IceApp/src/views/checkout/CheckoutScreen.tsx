@@ -20,7 +20,9 @@ import ShippingSegment from './ShippingSegment';
 import MasterCardIcon from '../../assets/images/Mastercard_2019_logo.svg';
 import * as yup from 'yup';
 import {Formik, useFormik} from 'formik';
-import { useAppSelector } from '../../redux/hook';
+import {useAppDispatch, useAppSelector} from '../../redux/hook';
+import {ShippingInfo, updateShippingInfo} from '../../redux/order/orderSlice';
+import {useUser} from '../../context/userContext';
 const cardInputValidationSchema = yup.object().shape({
   cardNumber: yup
     .string()
@@ -166,14 +168,22 @@ const ProcessSegment = ({screenIndex, onClick}) => {
       <View style={localStyles.processContainer}>
         {processArray.map((label, index) => {
           if (index <= screenIndex) {
-            return <Text style={{opacity: 0.9}}>{label}</Text>;
-          } else return <Text style={{opacity: 0.3}}>{label}</Text>;
+            return (
+              <Text style={{opacity: 0.9}} key={index}>
+                {label}
+              </Text>
+            );
+          } else
+            return (
+              <Text style={{opacity: 0.3}} key={index}>
+                {label}
+              </Text>
+            );
         })}
       </View>
     </View>
   );
 };
-
 
 const PaymentCard = () => {
   return (
@@ -291,7 +301,7 @@ const CardForm = () => {
         onBlur={formik.handleBlur('cardholderName')}
         value={formik.values.cardholderName}
         style={{
-          fontSize: 16,  
+          fontSize: 16,
           paddingVertical: 15,
           paddingHorizontal: 20,
           backgroundColor: '#f6f6f6',
@@ -366,7 +376,7 @@ const PriceSegment = () => {
   );
 };
 const foodContainer = StyleSheet.compose(styles.childContainer, {
-  height: 250
+  height: 250,
 });
 
 const priceRow = StyleSheet.compose(styles.row, {
@@ -421,17 +431,48 @@ const ProdSegment = () => {
 const SubmitSegment = () => {
   return (
     <View>
-      < ProdSegment />
-      <PriceSegment/>
+      <ProdSegment />
+      <PriceSegment />
     </View>
   );
 };
 const CheckoutScreen = ({navigation}) => {
+  const {user: userInfo} = useUser();
+  const dispatch = useAppDispatch();
+  const {shippingInfo: shippingInfoOrder} = useAppSelector(
+    state => state.orderCreate,
+  );
   const [screenIndex, setScreenIndex] = useState(0);
   const handleClickChangeScreen = screenIndex => {
     setScreenIndex(screenIndex);
   };
   const [disable, setDisable] = useState(false);
+  console.log('shippingInfoState: ', shippingInfoOrder);
+  const initialShippingInfo: ShippingInfo = {
+    receiverName:
+      shippingInfoOrder.receiverName !== null
+        ? shippingInfoOrder.receiverName
+        : userInfo.fullname,
+    phoneNumber:
+      shippingInfoOrder.phoneNumber !== null
+        ? shippingInfoOrder.phoneNumber
+        : userInfo.phoneNumber,
+    province: 'Hanoi',
+    address:
+      shippingInfoOrder.address !== null ? shippingInfoOrder.address : '',
+    shippingInstruction:
+      shippingInfoOrder.shippingInstruction !== null
+        ? shippingInfoOrder.shippingInstruction
+        : '',
+  };
+  console.log('initShippingInfoState: ', initialShippingInfo);
+
+  const [shippingInfo, setShippingInfo] =
+    useState<ShippingInfo>(initialShippingInfo);
+  const handleShippingInfo = (name: string, value: string) => {
+    setShippingInfo({...shippingInfo, [name]: value});
+  };
+
   useEffect(() => {
     const headerLeft = () => (
       <Ionicons
@@ -470,7 +511,12 @@ const CheckoutScreen = ({navigation}) => {
         />
         <Spacer height={30} />
         {screenIndex === 0 ? (
-          <ShippingSegment navigation={navigation}  setDisable={setDisable}/>
+          <ShippingSegment
+            navigation={navigation}
+            setDisable={setDisable}
+            shippingInfo={shippingInfo}
+            handleShippingInfo={handleShippingInfo}
+          />
         ) : screenIndex == 1 ? (
           <PaymentSegment />
         ) : (
@@ -479,11 +525,14 @@ const CheckoutScreen = ({navigation}) => {
         <Spacer height={30} />
         <TouchableOpacity
           onPress={() => {
+            if (screenIndex === 0) {
+              dispatch(updateShippingInfo(shippingInfo));
+            }
             if (screenIndex < 2) setScreenIndex(screenIndex + 1);
             else navigation.navigate('Home');
           }}
           // disabled={disable}
-          >
+        >
           <View style={styles.button}>
             <Text style={styles.buttonText}>Next</Text>
           </View>
