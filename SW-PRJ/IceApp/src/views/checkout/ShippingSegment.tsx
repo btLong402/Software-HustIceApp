@@ -15,6 +15,11 @@ import * as Yup from 'yup';
 import {useUser} from '../../context/userContext';
 import React, {useState} from 'react';
 
+type Shipping = {
+  navigation: any;
+  setDisable: (boolean) => void;
+};
+
 const ShippingForm = ({userInfo}) => {
   const [selectedLanguage, setSelectedLanguage] = useState();
 
@@ -143,7 +148,7 @@ const ShippingForm = ({userInfo}) => {
   );
 };
 
-const ShippingSegment = ({navigation: any}) => {
+const ShippingSegment = (props: Shipping) => {
   const {user: userInfo} = useUser();
 
   return (

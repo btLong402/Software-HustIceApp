@@ -21,6 +21,7 @@ export default styles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
+    alignItems: 'center'
   },
   jusitfyBetween: {
     justifyContent: 'space-between',
@@ -45,4 +46,8 @@ export default styles = StyleSheet.create({
     fontWeight: '500',
     letterSpacing: 0.8,
   },
+  errors : {
+    color: 'red',
+    marginLeft: 2,
+  }
 });
