@@ -27,13 +27,10 @@ const signUpValidationSchema = yup.object().shape({
       'Phone number is a Vietnamese phone number with 10 digits',
     )
     .required(),
-  username: yup
+  fullname: yup
     .string()
     .trim()
-    .matches(/^[a-zA-Z0-9]+$/, 'Username must be alphanumeric')
-    .min(6, 'Username must be at least 6 characters')
-    .max(50, 'Username cannot be longer than 50 characters')
-    .required('Username is required'),
+    .matches(/^[a-zA-Z0-9]+$/, 'Full name must be alphanumeric'),
   password: yup.string().min(6).max(50).required(),
   confirmPassword: yup
     .string()
@@ -106,7 +103,7 @@ const SignUp = ({navigation}: any) => {
       setIsOpen(true);
     }
   };
-  
+
   return (
     <ScrollView
       ref={scrollViewRef}
@@ -121,13 +118,13 @@ const SignUp = ({navigation}: any) => {
           initialValues={{
             phoneNumber: '',
             password: '',
-            username: '',
+            fullname: '',
             confirmPassword: '',
           }}
           onSubmit={async values => {
-            const {password, phoneNumber, username} = values;
+            const {password, phoneNumber, fullname} = values;
             try {
-              await signUp({username, password, phoneNumber});
+              await signUp({fullname, password, phoneNumber});
             } catch (error: any) {
               setMess({type: 'error', message: error.message});
             }
@@ -145,7 +142,7 @@ const SignUp = ({navigation}: any) => {
                 touched.constructor === Object) ||
               errors.confirmPassword === null ||
               errors.password === null ||
-              errors.username === null ||
+              errors.fullname === null ||
               errors.phoneNumber === null;
             return (
               <>
@@ -166,14 +163,14 @@ const SignUp = ({navigation}: any) => {
                   <View style={styles.input_border}>
                     <TextInput
                       style={styles.input}
-                      placeholder="Username"
-                      onChangeText={handleChange('username')}
-                      onBlur={handleBlur('username')}
-                      value={values.username}
+                      placeholder="Full Name (optional)"
+                      onChangeText={handleChange('fullname')}
+                      onBlur={handleBlur('fullname')}
+                      value={values.fullname}
                     />
                   </View>
-                  {errors.username && touched.username && (
-                    <Text style={{color: 'black'}}>{errors.username}</Text>
+                  {errors.fullname && touched.fullname && (
+                    <Text style={{color: 'black'}}>{errors.fullname}</Text>
                   )}
                   <View style={styles.input_border}>
                     <TextInput

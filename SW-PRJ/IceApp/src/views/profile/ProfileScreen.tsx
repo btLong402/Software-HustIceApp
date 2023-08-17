@@ -247,7 +247,9 @@ const ProfileScreen = ({route, navigation}) => {
             <ProfileRow
               label="Email"
               value={
-                userProfileState.email ? userProfileState.email : 'Enter email'
+                userProfileState.email !== 'null'
+                  ? userProfileState.email
+                  : 'Enter email'
               }
               navigation={navigation}
               onClick={handleClickChangeType}

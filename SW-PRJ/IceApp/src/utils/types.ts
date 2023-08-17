@@ -31,7 +31,6 @@ export interface AuthContextProps {
   signOut: () => void;
   signUp: (data: {
     phoneNumber: string;
-    username: string;
     password: string;
   }) => Promise<void>;
 }
