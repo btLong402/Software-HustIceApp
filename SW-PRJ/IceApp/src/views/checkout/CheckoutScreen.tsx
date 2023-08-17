@@ -20,9 +20,13 @@ import ShippingSegment from './ShippingSegment';
 import MasterCardIcon from '../../assets/images/Mastercard_2019_logo.svg';
 import * as yup from 'yup';
 import {Formik, useFormik} from 'formik';
+<<<<<<< HEAD
 import {useAppDispatch, useAppSelector} from '../../redux/hook';
 import {ShippingInfo, updateShippingInfo} from '../../redux/order/orderSlice';
 import {useUser} from '../../context/userContext';
+=======
+import {useAppSelector} from '../../redux/hook';
+>>>>>>> ce0636321645458a8ce8766105288700392cef59
 const cardInputValidationSchema = yup.object().shape({
   cardNumber: yup
     .string()
