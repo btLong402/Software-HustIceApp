@@ -18,6 +18,7 @@ import Spacer from '../../components/Spacer';
 import Seperator from '../../components/Seperator';
 import ShippingSegment from './ShippingSegment';
 import {useUser} from '../../context/userContext';
+import {useAuth} from '../../context/authContext';
 import * as yup from 'yup';
 import {Formik, useFormik} from 'formik';
 import {useAppDispatch, useAppSelector} from '../../redux/hook';
@@ -25,6 +26,7 @@ import {
   ShippingInfo,
   updateShippingInfo,
   clear,
+  OrderLine,
 } from '../../redux/order/orderSlice';
 import {createOrder} from '../../services/order-api';
 const cardInputValidationSchema = yup.object().shape({
@@ -504,14 +506,19 @@ const CheckoutScreen = ({navigation}) => {
       },
     });
   });
+  const {_id} = useAuth();
   const handleNextButtonPress = async () => {
+    let end : boolean = false;
     if (screenIndex === 0) {
       dispatch(updateShippingInfo(shippingInfo));
     }
     if (screenIndex < 2) {
       setScreenIndex(screenIndex + 1);
     } else {
-      await createOrder(orderCreate).then((_) => dispatch(clear()));
+      await createOrder({order: orderCreate, cusId : _id}).then((_) => end = true);
+    }
+    if(end !== false){
+      dispatch(clear());
       navigation.navigate('Home');
     }
   };

@@ -97,9 +97,9 @@ export const orderSlice = createSlice({
     updateShippingInfo: (state, action: PayloadAction<ShippingInfo>) => {
       state.shippingInfo = action.payload;
     },
-    clear : (state) => {
-      state = initialState;
-    }
+    clear: state => {
+      Object.assign(state, initialState);
+    },
   },
 });
 
@@ -111,7 +111,7 @@ export const {
   deleteOrderLine,
   updateShippingInfo,
   updateTime,
-  clear
+  clear,
 } = orderSlice.actions;
 
 export default orderSlice.reducer;

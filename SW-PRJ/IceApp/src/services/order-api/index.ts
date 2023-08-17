@@ -12,10 +12,9 @@ export const getHistory = async (customerId: string) => {
   }
 };
 
-export const createOrder = async (order: Order) => {
-  const {_id} = useAuth();
+export const createOrder = async ({order, cusId}) => {
   const newOrder: any = {
-    customerId: _id,
+    customerId: cusId,
     orderLine: order.orderLines,
     shippingAddress: order.shippingInfo.address,
     total: order.totalPrice * (1 - order.discount) + 15000,
