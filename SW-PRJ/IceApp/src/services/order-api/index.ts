@@ -1,6 +1,8 @@
 /* eslint-disable prettier/prettier */
+import { Order } from '../../redux/order/orderSlice';
 import {client} from '../client';
 import {Alert} from 'react-native';
+import {useAuth, AuthActionType} from '../../context/authContext';
 export const getHistory = async (customerId: string) => {
   try {
     const response = await client.get(`/order/${customerId}/history`);
@@ -10,9 +12,16 @@ export const getHistory = async (customerId: string) => {
   }
 };
 
-export const createOrder = async (order: any) => {
+export const createOrder = async (order: Order) => {
+  const {_id} = useAuth();
+  const newOrder: any = {
+    customerId: _id,
+    orderLine: order.orderLines,
+    shippingAddress: order.shippingInfo.address,
+    total: order.totalPrice * (1 - order.discount) + 15000,
+  };
   await client
-    .post('/order/create-order', order)
+    .post('/order/create-order', newOrder)
     .then(res => {
       if (res.status === 200) {
         Alert.alert('Order created successfully');

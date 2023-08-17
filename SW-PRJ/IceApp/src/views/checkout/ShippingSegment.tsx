@@ -38,10 +38,7 @@ const ShippingForm = ({shippingInfo, handleShippingInfo}) => {
 
   const handleSubmit = values => {
     // Handle form submission logic here
-    console.log(values);
   };
-
-  console.log('shippingInfo: ', shippingInfo);
 
   return (
     <View style={styles.container}>

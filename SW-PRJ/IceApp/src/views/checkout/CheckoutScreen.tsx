@@ -17,10 +17,16 @@ import styles from './styles';
 import Spacer from '../../components/Spacer';
 import Seperator from '../../components/Seperator';
 import ShippingSegment from './ShippingSegment';
-import MasterCardIcon from '../../assets/images/Mastercard_2019_logo.svg';
+import {useUser} from '../../context/userContext';
 import * as yup from 'yup';
 import {Formik, useFormik} from 'formik';
-import {useAppSelector} from '../../redux/hook';
+import {useAppDispatch, useAppSelector} from '../../redux/hook';
+import {
+  ShippingInfo,
+  updateShippingInfo,
+  clear,
+} from '../../redux/order/orderSlice';
+import {createOrder} from '../../services/order-api';
 const cardInputValidationSchema = yup.object().shape({
   cardNumber: yup
     .string()
@@ -440,6 +446,7 @@ const CheckoutScreen = ({navigation}) => {
   const {shippingInfo: shippingInfoOrder} = useAppSelector(
     state => state.orderCreate,
   );
+  const {orderCreate} = useAppSelector(state => state);
   const [screenIndex, setScreenIndex] = useState(0);
   const handleClickChangeScreen = screenIndex => {
     setScreenIndex(screenIndex);
@@ -463,7 +470,7 @@ const CheckoutScreen = ({navigation}) => {
         ? shippingInfoOrder.shippingInstruction
         : '',
   };
-  console.log('initShippingInfoState: ', initialShippingInfo);
+  // console.log('initShippingInfoState: ', initialShippingInfo);
 
   const [shippingInfo, setShippingInfo] =
     useState<ShippingInfo>(initialShippingInfo);
@@ -497,7 +504,17 @@ const CheckoutScreen = ({navigation}) => {
       },
     });
   });
-
+  const handleNextButtonPress = async () => {
+    if (screenIndex === 0) {
+      dispatch(updateShippingInfo(shippingInfo));
+    }
+    if (screenIndex < 2) {
+      setScreenIndex(screenIndex + 1);
+    } else {
+      await createOrder(orderCreate).then((_) => dispatch(clear()));
+      navigation.navigate('Home');
+    }
+  };
   return (
     <View style={styles.container}>
       <SafeAreaView style={{flex: 1}}>
@@ -522,17 +539,13 @@ const CheckoutScreen = ({navigation}) => {
         )}
         <Spacer height={30} />
         <TouchableOpacity
-          onPress={() => {
-            if (screenIndex === 0) {
-              dispatch(updateShippingInfo(shippingInfo));
-            }
-            if (screenIndex < 2) setScreenIndex(screenIndex + 1);
-            else navigation.navigate('Home');
-          }}
+          onPress={handleNextButtonPress}
           // disabled={disable}
         >
           <View style={styles.button}>
-            <Text style={styles.buttonText}>Next</Text>
+            <Text style={styles.buttonText}>
+              {screenIndex < 2 ? 'Next' : 'Confirm'}
+            </Text>
           </View>
         </TouchableOpacity>
         <Spacer height={5} />
