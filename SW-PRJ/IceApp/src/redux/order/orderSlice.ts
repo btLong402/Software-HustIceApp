@@ -9,6 +9,8 @@ export interface OrderLine {
   size?: string;
   quantity: number;
   subTotal: number;
+  thumbnail: string;
+  name: string;
 }
 
 export interface Order {

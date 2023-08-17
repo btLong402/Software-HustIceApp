@@ -13,6 +13,7 @@ import Seperator from '../../components/Seperator';
 import styles from './styles';
 import {Image} from 'react-native';
 import { useAppSelector } from '../../redux/hook';
+import { OrderLine } from '../../redux/order/orderSlice';
 
 const PriceSegment = () => {
   const {totalPrice, discount} = useAppSelector(state => state.orderCreate)
@@ -50,19 +51,19 @@ const PriceSegment = () => {
 };
 
 const ProdSegment = () => {
+  const {orderLines} = useAppSelector(state => state.orderCreate);
   return (
     <View style={foodContainer}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        {Array(4)
-          .fill(0)
-          .map((_, index) => {
+        {orderLines
+          .map((line : OrderLine, index: number) => {
             return (
               <View key={index}>
                 <View style={styles.row}>
                   <Image
                     style={localStyles.prodImage}
                     source={{
-                      uri: 'https://tea-3.lozi.vn/v1/ship/resized/test-huongg-lam-dong-1637048248725161849-supper-sundae-dau-tay-0-1680061286?w=640&type=o',
+                      uri: line.thumbnail,
                     }}
                   />
                   <View style={localStyles.prodInfo}>
@@ -70,15 +71,15 @@ const ProdSegment = () => {
                       style={localStyles.prodName}
                       numberOfLines={1}
                       ellipsizeMode="tail">
-                      Supper Sundae Dâu Tây x 2
+                      {line.name} x {String(line.quantity)}
                     </Text>
                     <Text
                       style={localStyles.prodDesc}
                       numberOfLines={1}
                       ellipsizeMode="tail">
-                      Kem + Mứt dâu tây
+                        Des:
                     </Text>
-                    <Text style={localStyles.prodPrice}>$ 100</Text>
+                    <Text style={localStyles.prodPrice}>{String(line.subTotal)} VND</Text>
                   </View>
                 </View>
                 <Spacer height={15} />

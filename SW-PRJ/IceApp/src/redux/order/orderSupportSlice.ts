@@ -19,6 +19,8 @@ const initialState: {line: OrderLine, tmp: number, oldSize: number} = {
     includedTopping: [],
     quantity: 1,
     subTotal: 0,
+    thumbnail: '',
+    name: '',
   },
   tmp: 0,
   oldSize: 0,
@@ -35,6 +37,8 @@ export const orderLineSlice = createSlice({
         includedTopping: [],
         size: action.payload.size[0].size,
         subTotal: action.payload.basePrice,
+        thumbnail: action.payload.thumbnail,
+        name: action.payload.name,
       };
       state.line = newOrderLine;
       state.tmp = action.payload.basePrice;

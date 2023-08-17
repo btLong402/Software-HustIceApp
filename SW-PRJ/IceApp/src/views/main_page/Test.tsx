@@ -114,7 +114,7 @@ function Test({route}: any) {
             navigation.pop();
           }
         }>
-          <Text style={styles.name}>Buy Now</Text>
+          <Text style={styles.name}>Add</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
