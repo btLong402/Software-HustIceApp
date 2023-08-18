@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  Alert,
 } from 'react-native';
 import React, {useEffect} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -13,11 +14,11 @@ import Spacer from '../../components/Spacer';
 import Seperator from '../../components/Seperator';
 import styles from './styles';
 import {Image} from 'react-native';
-import { useAppDispatch, useAppSelector } from '../../redux/hook';
+import {useAppDispatch, useAppSelector} from '../../redux/hook';
 import {OrderLine, deleteOrderLine} from '../../redux/order/orderSlice';
 import Icon from 'react-native-vector-icons/AntDesign';
 const PriceSegment = () => {
-  const {totalPrice, discount} = useAppSelector(state => state.orderCreate)
+  const {totalPrice, discount} = useAppSelector(state => state.orderCreate);
   return (
     <View style={priceContainer}>
       <View style={priceRow}>
@@ -45,55 +46,57 @@ const PriceSegment = () => {
           }>
           Total
         </Text>
-        <Text style={localStyles.value}>{String(totalPrice * (1 - discount) + 15000)} VND</Text>
+        <Text style={localStyles.value}>
+          {String(totalPrice * (1 - discount) + 15000)} VND
+        </Text>
       </View>
     </View>
   );
 };
 
-const ProdSegment = () => {
-  const {orderLines} = useAppSelector(state => state.orderCreate);
+const ProdSegment = ({orderLine}) => {
   const dispatch = useAppDispatch();
   return (
     <View style={foodContainer}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        {orderLines
-          .map((line : OrderLine, index: number) => {
-            return (
-              <View key={index}>
-                <View style={styles.row}>
-                  <Image
-                    style={localStyles.prodImage}
-                    source={{
-                      uri: line.thumbnail,
-                    }}
-                  />
-                  <View style={localStyles.prodInfo}>
-                    <Text
-                      style={localStyles.prodName}
-                      numberOfLines={1}
-                      ellipsizeMode="tail">
-                      {line.name} x {String(line.quantity)}
-                    </Text>
-                    <Text
-                      style={localStyles.prodDesc}
-                      numberOfLines={1}
-                      ellipsizeMode="tail">
-                      Des:
-                    </Text>
-                    <Text style={localStyles.prodPrice}>
-                      {String(line.subTotal)} VND
-                    </Text>
-                  </View>
-                  <IconButton
-                    icon={<Icon name="minus" size={16} color="red" />}
-                    onPress={() => dispatch(deleteOrderLine({productId : line.productId}))}
-                  />
+        {orderLine.map((line: OrderLine, index: number) => {
+          return (
+            <View key={index}>
+              <View style={styles.row}>
+                <Image
+                  style={localStyles.prodImage}
+                  source={{
+                    uri: line.thumbnail,
+                  }}
+                />
+                <View style={localStyles.prodInfo}>
+                  <Text
+                    style={localStyles.prodName}
+                    numberOfLines={1}
+                    ellipsizeMode="tail">
+                    {line.name} x {String(line.quantity)}
+                  </Text>
+                  <Text
+                    style={localStyles.prodDesc}
+                    numberOfLines={1}
+                    ellipsizeMode="tail">
+                    Des:
+                  </Text>
+                  <Text style={localStyles.prodPrice}>
+                    {String(line.subTotal)} VND
+                  </Text>
                 </View>
-                <Spacer height={15} />
+                <IconButton
+                  icon={<Icon name="minus" size={16} color="red" />}
+                  onPress={() =>
+                    dispatch(deleteOrderLine({productId: line.productId}))
+                  }
+                />
               </View>
-            );
-          })}
+              <Spacer height={15} />
+            </View>
+          );
+        })}
       </ScrollView>
     </View>
   );
@@ -126,17 +129,19 @@ const CartScreen = ({navigation}) => {
       },
     });
   });
-
+  const {orderLine} = useAppSelector(state => state.orderCreate);
   return (
     <View style={styles.container}>
       <SafeAreaView style={{flex: 1}}>
         <PriceSegment />
         <Spacer height={30} />
-        <ProdSegment />
+        <ProdSegment orderLine={orderLine} />
         <Spacer height={30} />
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate('Checkout');
+            if (orderLine.length === 0) {
+              Alert.alert('Empty cart!');
+            } else navigation.navigate('Checkout');
           }}>
           <View style={styles.button}>
             <Text style={styles.buttonText}>Checkout</Text>

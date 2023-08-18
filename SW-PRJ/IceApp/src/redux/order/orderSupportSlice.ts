@@ -3,7 +3,6 @@ import type {PayloadAction} from '@reduxjs/toolkit';
 import {Size} from '../size/sizeSlice';
 import {Topping} from '../topping/toppingSlice';
 import {OrderLine} from './orderSlice';
-import { getSizePrice } from '../../utils';
 export interface Choose {
   productId: string;
   basePrice: number;
@@ -35,13 +34,13 @@ export const orderLineSlice = createSlice({
         productId: action.payload.productId,
         quantity: 1,
         includedTopping: [],
-        size: action.payload.size[0].size,
-        subTotal: action.payload.basePrice,
+        size: action.payload.size[0].sizeId,
+        subTotal: action.payload.basePrice + action.payload.size[0].price,
         thumbnail: action.payload.thumbnail,
         name: action.payload.name,
       };
       state.line = newOrderLine;
-      state.tmp = action.payload.basePrice;
+      state.tmp = action.payload.basePrice + action.payload.size[0].price;
       state.oldSize = action.payload.size[0].price;
     },
     incrementQuantity: state => {

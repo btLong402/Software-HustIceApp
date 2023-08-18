@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Order } from '../../redux/order/orderSlice';
+import {Order} from '../../redux/order/orderSlice';
 import {client} from '../client';
 import {Alert} from 'react-native';
 import {useAuth, AuthActionType} from '../../context/authContext';
@@ -13,12 +13,23 @@ export const getHistory = async (customerId: string) => {
 };
 
 export const createOrder = async ({order, cusId}) => {
+  let orderLine = [];
+  for (let i of order.orderLine) {
+    orderLine.push({
+      productId: i.productId,
+      includedTopping: i.includedTopping,
+      size: i.size,
+      quantity: i.quantity,
+      subtotal: i.subtotal,
+    });
+  }
   const newOrder: any = {
     customerId: cusId,
-    orderLine: order.orderLines,
+    orderLine: orderLine,
     shippingAddress: order.shippingInfo.address,
     total: order.totalPrice * (1 - order.discount) + 15000,
   };
+  console.log('🚀 ~ file: index.ts:28 ~ createOrder ~ newOrder:', newOrder);
   await client
     .post('/order/create-order', newOrder)
     .then(res => {

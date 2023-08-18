@@ -393,11 +393,11 @@ const priceContainer = StyleSheet.compose(styles.childContainer, {
 });
 
 const ProdSegment = () => {
-  const {orderLines} = useAppSelector(state => state.orderCreate);
+  const {orderLine} = useAppSelector(state => state.orderCreate);
   return (
     <View style={foodContainer}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        {orderLines.map((line: OrderLine, index: number) => {
+        {orderLine.map((line: OrderLine, index: number) => {
           return (
             <View key={index}>
               <View style={styles.row}>
@@ -508,16 +508,18 @@ const CheckoutScreen = ({navigation}) => {
   });
   const {_id} = useAuth();
   const handleNextButtonPress = async () => {
-    let end : boolean = false;
+    let end: boolean = false;
     if (screenIndex === 0) {
       dispatch(updateShippingInfo(shippingInfo));
     }
     if (screenIndex < 2) {
       setScreenIndex(screenIndex + 1);
     } else {
-      await createOrder({order: orderCreate, cusId : _id}).then((_) => end = true);
+      await createOrder({order: orderCreate, cusId: _id}).then(
+        _ => (end = true),
+      );
     }
-    if(end !== false){
+    if (end !== false) {
       dispatch(clear());
       navigation.navigate('Home');
     }
