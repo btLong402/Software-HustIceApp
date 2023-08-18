@@ -15,7 +15,7 @@ export interface OrderLine {
 
 export interface Order {
   orderId: number;
-  orderLines: Array<OrderLine>;
+  orderLine: Array<OrderLine>;
   note: string;
   status: string;
   isPaid: boolean;
@@ -35,7 +35,7 @@ export interface ShippingInfo {
 
 const initialState: Order = {
   orderId: 0,
-  orderLines: [],
+  orderLine: [],
   note: '',
   status: '',
   isPaid: false,
@@ -56,33 +56,33 @@ export const orderSlice = createSlice({
   initialState: initialState,
   reducers: {
     addNewOrderLine: (state, action: PayloadAction<OrderLine>) => {
-      const index = state.orderLines.findIndex(
+      const index = state.orderLine.findIndex(
         orderLine => orderLine.productId === action.payload.productId,
       );
       if (index !== -1) {
         state.totalPrice +=
-          action.payload.subTotal - state.orderLines[index].subTotal;
-        state.orderLines[index] = action.payload;
+          action.payload.subTotal - state.orderLine[index].subTotal;
+        state.orderLine[index] = action.payload;
       } else {
-        state.orderLines.push(action.payload);
+        state.orderLine.push(action.payload);
         state.totalPrice += action.payload.subTotal;
       }
     },
     deleteOrderLine: (state, action: PayloadAction<{productId: string}>) => {
-      const index = state.orderLines.findIndex(
+      const index = state.orderLine.findIndex(
         orderLine => orderLine.productId === action.payload.productId,
       );
       if (index !== -1) {
-        state.totalPrice -= state.orderLines[index].subTotal;
-        state.orderLines.splice(index, 1);
+        state.totalPrice -= state.orderLine[index].subTotal;
+        state.orderLine.splice(index, 1);
       }
     },
     updateOrderLine: (state, action: PayloadAction<OrderLine>) => {
-      const index = state.orderLines.findIndex(
+      const index = state.orderLine.findIndex(
         orderLine => orderLine.productId === action.payload.productId,
       );
       if (index !== -1) {
-        state.orderLines[index] = action.payload;
+        state.orderLine[index] = action.payload;
       }
     },
     updateNote: (state, action: PayloadAction<string>) => {

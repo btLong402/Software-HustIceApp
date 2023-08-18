@@ -12,6 +12,7 @@ import {
   FlatList,
   Dimensions,
   ImageBackground,
+  Alert,
 } from 'react-native';
 
 import Icon from 'react-native-vector-icons/AntDesign';
@@ -27,7 +28,8 @@ import {
   setSize,
 } from '../../redux/order/orderSupportSlice';
 import {useNavigation} from '@react-navigation/native';
-import {deleteOrderLine, addNewOrderLine } from '../../redux/order/orderSlice';
+import {deleteOrderLine, addNewOrderLine} from '../../redux/order/orderSlice';
+import { useAuth } from '../../context/authContext';
 function Test({route}: any) {
   const navigation = useNavigation();
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
@@ -37,6 +39,7 @@ function Test({route}: any) {
   const {productId, basePrice, size, thumbnail, toppingList, name} = product;
   let {quantity, subTotal} = useAppSelector(state => state.orderLine.line);
   let {line} = useAppSelector(state => state.orderLine);
+   const {isSignout} = useAuth();
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
@@ -60,7 +63,7 @@ function Test({route}: any) {
         />
         <View style={styles.des}>
           <View style={styles.price}>
-            <Text style={styles.h1}> {basePrice} VND</Text>
+            <Text style={styles.h1}> {basePrice + size[0].price} VND</Text>
           </View>
           <View style={styles.textField}>
             <Text style={styles.title}>Description</Text>
@@ -77,7 +80,11 @@ function Test({route}: any) {
           {size.map((e: Size, i: number) => (
             <CheckBox
               key={i}
-              title={`${e.size} + ${e.price} VND`}
+              title={`${e.size} + ${
+                i === 0
+                  ? `${e.price + basePrice} VND(Default)`
+                  : `${e.price + basePrice} VND`
+              }`}
               checkedIcon="dot-circle-o"
               uncheckedIcon="circle-o"
               checked={selectedIndex === i}
@@ -108,12 +115,32 @@ function Test({route}: any) {
             onPress={() => dispatch(incrementQuantity())}
           />
         </View>
-        <TouchableOpacity style={styles.btn_buy_now} onPress={
-          () => {
-            dispatch(addNewOrderLine(line));
-            navigation.pop();
-          }
-        }>
+        <TouchableOpacity
+          style={styles.btn_buy_now}
+          onPress={() => {
+            if(!isSignout){
+              dispatch(addNewOrderLine(line));
+              navigation.pop();
+            }
+            else{
+              Alert.alert(
+                'Please sign in to order!',
+                'Do you want to sign in now?',
+                [
+                  {
+                    text: 'Cancel',
+                    style: 'cancel',
+                  },
+                  {
+                    text: 'Ok',
+                    onPress: () => 
+                      navigation.push('SignIn')
+                    ,
+                  },
+                ],
+              );
+            }
+          }}>
           <Text style={styles.name}>Add</Text>
         </TouchableOpacity>
       </View>
