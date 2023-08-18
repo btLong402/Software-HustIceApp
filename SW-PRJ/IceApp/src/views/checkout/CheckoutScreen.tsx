@@ -31,15 +31,30 @@ import {
   OrderLine,
 } from '../../redux/order/orderSlice';
 import {createOrder} from '../../services/order-api';
+const today = new Date();
 const cardInputValidationSchema = yup.object().shape({
   cardNumber: yup
     .string()
-    .matches(/^\d{16}$/, 'Số thẻ tín dụng phải có 16 chữ số')
+    .matches(/^\d{16}$/, 'Số thẻ tín dụng phải là số và có 16 chữ số')
     .required('Số thẻ tín dụng là bắt buộc'),
   cardholderName: yup.string().required('Tên chủ thẻ là bắt buộc'),
   expirationDate: yup
     .string()
     .matches(/^(0[1-9]|1[0-2])\/\d{2}$/, 'Ngày hết hạn không hợp lệ')
+    .test('expiration', 'Thẻ đã hết hạn', function (value) {
+      if (!value) {
+        // Không có ngày hết hạn được cung cấp
+        return true; // Bỏ qua kiểm tra này nếu không có ngày hết hạn
+      }
+
+      const [month, year] = value.split('/');
+      const expirationDate = new Date(
+        parseInt(year, 10) + 2000,
+        parseInt(month, 10) - 1,
+      );
+
+      return expirationDate > today;
+    })
     .required('Ngày hết hạn là bắt buộc'),
   cvv: yup
     .string()
