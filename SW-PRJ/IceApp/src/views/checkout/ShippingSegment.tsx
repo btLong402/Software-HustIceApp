@@ -18,7 +18,7 @@ import {useAppDispatch} from '../../redux/hook';
 import {updateShippingInfo} from '../../redux/order/orderSlice';
 type Shipping = {
   navigation: any;
-  setDisable: (boolean) => void;
+  setDisable: React.Dispatch<React.SetStateAction<boolean>>;
   shippingInfo: any;
   handleShippingInfo: any;
 };

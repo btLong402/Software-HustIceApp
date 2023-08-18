@@ -29,7 +29,7 @@ import {
 } from '../../redux/order/orderSupportSlice';
 import {useNavigation} from '@react-navigation/native';
 import {deleteOrderLine, addNewOrderLine} from '../../redux/order/orderSlice';
-import { useAuth } from '../../context/authContext';
+import {useAuth} from '../../context/authContext';
 function Test({route}: any) {
   const navigation = useNavigation();
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
@@ -39,7 +39,7 @@ function Test({route}: any) {
   const {productId, basePrice, size, thumbnail, toppingList, name} = product;
   let {quantity, subTotal} = useAppSelector(state => state.orderLine.line);
   let {line} = useAppSelector(state => state.orderLine);
-   const {isSignout} = useAuth();
+  const {isSignout} = useAuth();
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
@@ -118,11 +118,11 @@ function Test({route}: any) {
         <TouchableOpacity
           style={styles.btn_buy_now}
           onPress={() => {
-            if(!isSignout){
+            if (!isSignout) {
               dispatch(addNewOrderLine(line));
+              Alert.alert('Add to cart success!');
               navigation.pop();
-            }
-            else{
+            } else {
               Alert.alert(
                 'Please sign in to order!',
                 'Do you want to sign in now?',
@@ -133,9 +133,7 @@ function Test({route}: any) {
                   },
                   {
                     text: 'Ok',
-                    onPress: () => 
-                      navigation.push('SignIn')
-                    ,
+                    onPress: () => navigation.push('SignIn'),
                   },
                 ],
               );
