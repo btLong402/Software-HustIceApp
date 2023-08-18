@@ -26,11 +26,11 @@ export interface Order {
 }
 
 export interface ShippingInfo {
-  receiverName: string | null;
-  phoneNumber: string | null;
-  address: string | null;
-  province: string | null;
-  shippingInstruction: string | null;
+  receiverName: string | null | undefined;
+  phoneNumber: string | null | undefined;
+  address: string | null | undefined;
+  province: string | null | undefined;
+  shippingInstruction: string | null | undefined;
 }
 
 const initialState: Order = {
