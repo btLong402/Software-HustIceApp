@@ -1,12 +1,20 @@
 import {SafeAreaView} from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {Modal, Pressable, Text} from 'native-base';
+
+interface ImagePickerModalProps {
+  isVisible: boolean;
+  onClose: () => void;
+  onImageLibraryPress: () => void;
+  onCameraPress: () => void;
+}
+
 export function ImagePickerModal({
   isVisible,
   onClose,
   onImageLibraryPress,
   onCameraPress,
-}) {
+}: ImagePickerModalProps) {
   return (
     <Modal isOpen={isVisible} onClose={onClose} safeAreaBottom={true}>
       <Modal.Content maxWidth="400px">
