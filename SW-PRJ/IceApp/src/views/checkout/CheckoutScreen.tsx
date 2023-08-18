@@ -246,8 +246,11 @@ const PaymentInputTitle = ({title}: PaymentInputTitleProps) => {
     </Text>
   );
 };
-
-const CardForm = () => {
+interface CardFormProps {
+  setIsValidIndex: (isValid: boolean) => void;
+  screenIndex: number;
+}
+const CardForm = ({setIsValidIndex, screenIndex}: CardFormProps) => {
   const formik = useFormik({
     initialValues: {
       cardNumber: '',
@@ -260,7 +263,10 @@ const CardForm = () => {
       Alert.alert(JSON.stringify(values, null, 2));
     },
   });
-
+  useEffect(() => {
+    const isEmpty = Object.values(formik.values).every(x => x !== '');
+    setIsValidIndex(screenIndex === 1 ? formik.isValid && isEmpty : false);
+  }, [formik.values, formik.isValid]);
   return (
     <View>
       <Spacer height={10} />
@@ -361,10 +367,18 @@ const CardForm = () => {
   );
 };
 
-const PaymentSegment = () => {
+interface PaymentSegmentProps {
+  setIsValidIndex: (isValid: boolean) => void;
+  screenIndex: number;
+}
+
+const PaymentSegment = ({
+  setIsValidIndex,
+  screenIndex,
+}: PaymentSegmentProps) => {
   return (
     <View style={mainContainer}>
-      <Text style={localStyles.header}>Add Payment Method</Text>
+      {/* <Text style={localStyles.header}>Add Payment Method</Text>
       <Spacer height={10} />
       <View style={StyleSheet.compose(styles.row, styles.jusitfyBetween)}>
         {Array(3)
@@ -372,10 +386,10 @@ const PaymentSegment = () => {
           .map((_, index) => {
             return <PaymentCard key={index} />;
           })}
-      </View>
+      </View> */}
       <Spacer height={20} />
       <ScrollView>
-        <CardForm />
+        <CardForm setIsValidIndex={setIsValidIndex} screenIndex={screenIndex} />
       </ScrollView>
     </View>
   );
@@ -491,7 +505,9 @@ const CheckoutScreen = ({navigation}) => {
   const handleClickChangeScreen = (screenIndex: number) => {
     setScreenIndex(screenIndex);
   };
-  const [disable, setDisable] = useState(false);
+  const [disable, setDisable] = useState<boolean>(false);
+
+  const [isValidFormIndex, setIsValidIndex] = useState<boolean>(false);
 
   const initialShippingInfo: ShippingInfo = {
     receiverName: shippingInfoOrder.receiverName || userInfo.fullname,
@@ -504,7 +520,7 @@ const CheckoutScreen = ({navigation}) => {
   const [shippingInfo, setShippingInfo] =
     useState<ShippingInfo>(initialShippingInfo);
 
-  console.log('shippingInfoState: ', shippingInfo);
+  // console.log('shippingInfoState: ', shippingInfo);
 
   const handleShippingInfo = (name: string, value: string) => {
     setShippingInfo(prevState => ({
@@ -541,6 +557,7 @@ const CheckoutScreen = ({navigation}) => {
   });
   const {_id} = useAuth();
   const handleNextButtonPress = async () => {
+    if (!isValidFormIndex) return;
     let end: boolean = false;
     if (screenIndex === 0) {
       dispatch(updateShippingInfo(shippingInfo));
@@ -557,6 +574,7 @@ const CheckoutScreen = ({navigation}) => {
       navigation.navigate('Home');
     }
   };
+
   return (
     <View style={styles.container}>
       <SafeAreaView style={{flex: 1}}>
@@ -571,9 +589,14 @@ const CheckoutScreen = ({navigation}) => {
             setDisable={setDisable}
             shippingInfo={shippingInfo}
             handleShippingInfo={handleShippingInfo}
+            setIsValidIndex={setIsValidIndex}
+            screenIndex={screenIndex}
           />
         ) : screenIndex == 1 ? (
-          <PaymentSegment />
+          <PaymentSegment
+            setIsValidIndex={setIsValidIndex}
+            screenIndex={screenIndex}
+          />
         ) : (
           <SubmitSegment />
         )}
@@ -582,7 +605,10 @@ const CheckoutScreen = ({navigation}) => {
           onPress={handleNextButtonPress}
           // disabled={disable}
         >
-          <View style={StyleSheet.compose(styles.button, {})}>
+          <View
+            style={StyleSheet.compose(styles.button, {
+              backgroundColor: !isValidFormIndex ? '#999999' : 'crimson',
+            })}>
             <Text style={styles.buttonText}>
               {screenIndex < 2 ? 'Next' : 'Confirm'}
             </Text>

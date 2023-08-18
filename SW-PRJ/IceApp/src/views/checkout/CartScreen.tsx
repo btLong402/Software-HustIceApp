@@ -103,6 +103,8 @@ const ProdSegment = ({orderLine}) => {
 };
 
 const CartScreen = ({navigation}) => {
+
+  
   useEffect(() => {
     const headerLeft = () => (
       <Ionicons
@@ -139,9 +141,10 @@ const CartScreen = ({navigation}) => {
         <Spacer height={30} />
         <TouchableOpacity
           onPress={() => {
-            if (orderLine.length === 0) {
-              Alert.alert('Empty cart!');
-            } else navigation.navigate('Checkout');
+            // if (orderLine.length === 0) {
+            // Alert.alert('Empty cart!');
+            // } else
+            navigation.navigate('Checkout');
           }}>
           <View style={styles.button}>
             <Text style={styles.buttonText}>Checkout</Text>
