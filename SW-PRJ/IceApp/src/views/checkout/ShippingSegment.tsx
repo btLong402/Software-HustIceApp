@@ -15,15 +15,22 @@ import * as Yup from 'yup';
 import {useUser} from '../../context/userContext';
 import React, {useState} from 'react';
 import {useAppDispatch} from '../../redux/hook';
-import {updateShippingInfo} from '../../redux/order/orderSlice';
+import {ShippingInfo, updateShippingInfo} from '../../redux/order/orderSlice';
 type Shipping = {
   navigation: any;
   setDisable: (boolean) => void;
   shippingInfo: any;
   handleShippingInfo: any;
 };
+interface ShippingFormProps {
+  shippingInfo: ShippingInfo;
+  handleShippingInfo: (key: string, value: string) => void;
+}
 
-const ShippingForm = ({shippingInfo, handleShippingInfo}) => {
+const ShippingForm = ({
+  shippingInfo,
+  handleShippingInfo,
+}: ShippingFormProps) => {
   const validationSchema = Yup.object().shape({
     receiverName: Yup.string().required('Receiver name is required'),
     phoneNumber: Yup.string()
@@ -36,16 +43,12 @@ const ShippingForm = ({shippingInfo, handleShippingInfo}) => {
     ),
   });
 
-  const handleSubmit = values => {
-    // Handle form submission logic here
-  };
-
   return (
     <View style={styles.container}>
       <Formik
         initialValues={shippingInfo}
         validationSchema={validationSchema}
-        onSubmit={handleSubmit}>
+        onSubmit={() => {}}>
         {({handleChange, handleBlur, values, errors, touched}) => (
           // <ScrollView showsVerticalScrollIndicator={false}>
           <View>
@@ -69,7 +72,7 @@ const ShippingForm = ({shippingInfo, handleShippingInfo}) => {
               placeholder="Phone Number"
               onChangeText={value => {
                 handleChange('phoneNumber')(value);
-                handleShippingInfo('phoneNumber', values.phoneNumber);
+                handleShippingInfo('phoneNumber', value);
               }}
               onBlur={handleBlur('phoneNumber')}
               value={values.phoneNumber}
@@ -97,7 +100,7 @@ const ShippingForm = ({shippingInfo, handleShippingInfo}) => {
               placeholder="Address"
               onChangeText={value => {
                 handleChange('address')(value);
-                handleShippingInfo('address', values.address);
+                handleShippingInfo('address', value);
               }}
               onBlur={handleBlur('address')}
               value={values.address}
@@ -109,6 +112,7 @@ const ShippingForm = ({shippingInfo, handleShippingInfo}) => {
 
             <Box>
               <Select
+                //@ts-ignore
                 selectedValue={values.shippingInstruction}
                 accessibilityLabel="Choose Shipping Instructions"
                 placeholder="Choose Shipping Instructions"
@@ -118,6 +122,7 @@ const ShippingForm = ({shippingInfo, handleShippingInfo}) => {
                 }}
                 style={{
                   height: 40,
+                  //@ts-ignore
                   fontSize: 15,
                 }}
                 mt={1}

@@ -9,6 +9,8 @@ import {
   ScrollView,
   Button,
   Alert,
+  Touchable,
+  TouchableNativeFeedback,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -44,6 +46,14 @@ const cardInputValidationSchema = yup.object().shape({
     .matches(/^\d{3,4}$/, 'Mã CVV không hợp lệ')
     .required('Mã CVV là bắt buộc'),
 });
+interface CircleProps {
+  backgroundColor: string;
+  borderWidth?: number;
+  text?: string;
+  textColor?: string;
+  opacity?: number;
+  onClick?: () => void;
+}
 
 const Circle = ({
   backgroundColor,
@@ -52,7 +62,7 @@ const Circle = ({
   textColor = 'black',
   opacity = 1,
   onClick = () => {},
-}) => {
+}: CircleProps) => {
   return (
     <View
       style={{
@@ -84,7 +94,10 @@ const Circle = ({
   );
 };
 
-const ProcessLine = ({screenIndex}) => {
+interface ProcessLineProps {
+  screenIndex: number;
+}
+const ProcessLine = ({screenIndex}: ProcessLineProps) => {
   let percentage;
   if (screenIndex == 0) {
     percentage = 0;
@@ -126,9 +139,13 @@ const ProcessLine = ({screenIndex}) => {
     </View>
   );
 };
+interface ProcessSegmentProps {
+  screenIndex: number;
+  onClick: (index: number) => void;
+}
 
-const ProcessSegment = ({screenIndex, onClick}) => {
-  const handleProcessCirleClick = index => {
+const ProcessSegment = ({screenIndex, onClick}: ProcessSegmentProps) => {
+  const handleProcessCircleClick = (index: number) => {
     if (index < screenIndex) {
       onClick(index);
     }
@@ -142,7 +159,7 @@ const ProcessSegment = ({screenIndex, onClick}) => {
           text={'✓'}
           textColor={'white'}
           key={index}
-          onClick={() => handleProcessCirleClick(index)}
+          onClick={() => handleProcessCircleClick(index)}
         />
       );
     } else if (index === screenIndex) {
@@ -150,7 +167,7 @@ const ProcessSegment = ({screenIndex, onClick}) => {
         <Circle
           backgroundColor={'crimson'}
           key={index}
-          onClick={() => handleProcessCirleClick(index)}
+          onClick={() => handleProcessCircleClick(index)}
         />
       );
     } else {
@@ -159,7 +176,7 @@ const ProcessSegment = ({screenIndex, onClick}) => {
           backgroundColor={'crimson'}
           opacity={0.2}
           key={index}
-          onClick={() => handleProcessCirleClick(index)}
+          onClick={() => handleProcessCircleClick(index)}
         />
       );
     }
@@ -199,7 +216,11 @@ const PaymentCard = () => {
   );
 };
 
-const PaymentInputTitle = ({title}) => {
+interface PaymentInputTitleProps {
+  title: string;
+}
+
+const PaymentInputTitle = ({title}: PaymentInputTitleProps) => {
   return (
     <Text
       style={{
@@ -442,6 +463,7 @@ const SubmitSegment = () => {
     </View>
   );
 };
+
 const CheckoutScreen = ({navigation}) => {
   const {user: userInfo} = useUser();
   const dispatch = useAppDispatch();
@@ -450,34 +472,30 @@ const CheckoutScreen = ({navigation}) => {
   );
   const {orderCreate} = useAppSelector(state => state);
   const [screenIndex, setScreenIndex] = useState(0);
-  const handleClickChangeScreen = screenIndex => {
+
+  const handleClickChangeScreen = (screenIndex: number) => {
     setScreenIndex(screenIndex);
   };
   const [disable, setDisable] = useState(false);
-  console.log('shippingInfoState: ', shippingInfoOrder);
+
   const initialShippingInfo: ShippingInfo = {
-    receiverName:
-      shippingInfoOrder.receiverName !== null
-        ? shippingInfoOrder.receiverName
-        : userInfo.fullname,
-    phoneNumber:
-      shippingInfoOrder.phoneNumber !== null
-        ? shippingInfoOrder.phoneNumber
-        : userInfo.phoneNumber,
+    receiverName: shippingInfoOrder.receiverName || userInfo.fullname,
+    phoneNumber: shippingInfoOrder.phoneNumber || userInfo.phoneNumber,
     province: 'Hanoi',
-    address:
-      shippingInfoOrder.address !== null ? shippingInfoOrder.address : '',
-    shippingInstruction:
-      shippingInfoOrder.shippingInstruction !== null
-        ? shippingInfoOrder.shippingInstruction
-        : '',
+    address: shippingInfoOrder.address || '',
+    shippingInstruction: shippingInfoOrder.shippingInstruction || '',
   };
-  // console.log('initShippingInfoState: ', initialShippingInfo);
 
   const [shippingInfo, setShippingInfo] =
     useState<ShippingInfo>(initialShippingInfo);
+
+  console.log('shippingInfoState: ', shippingInfo);
+
   const handleShippingInfo = (name: string, value: string) => {
-    setShippingInfo({...shippingInfo, [name]: value});
+    setShippingInfo(prevState => ({
+      ...prevState,
+      [name]: value,
+    }));
   };
 
   useEffect(() => {
@@ -508,16 +526,18 @@ const CheckoutScreen = ({navigation}) => {
   });
   const {_id} = useAuth();
   const handleNextButtonPress = async () => {
-    let end : boolean = false;
+    let end: boolean = false;
     if (screenIndex === 0) {
       dispatch(updateShippingInfo(shippingInfo));
     }
     if (screenIndex < 2) {
       setScreenIndex(screenIndex + 1);
     } else {
-      await createOrder({order: orderCreate, cusId : _id}).then((_) => end = true);
+      await createOrder({order: orderCreate, cusId: _id}).then(
+        _ => (end = true),
+      );
     }
-    if(end !== false){
+    if (end !== false) {
       dispatch(clear());
       navigation.navigate('Home');
     }
@@ -525,8 +545,6 @@ const CheckoutScreen = ({navigation}) => {
   return (
     <View style={styles.container}>
       <SafeAreaView style={{flex: 1}}>
-        {/* <Circle /> */}
-        {/* <ProcessLine /> */}
         <ProcessSegment
           screenIndex={screenIndex}
           onClick={handleClickChangeScreen}
@@ -545,16 +563,16 @@ const CheckoutScreen = ({navigation}) => {
           <SubmitSegment />
         )}
         <Spacer height={30} />
-        <TouchableOpacity
+        <TouchableNativeFeedback
           onPress={handleNextButtonPress}
           // disabled={disable}
         >
-          <View style={styles.button}>
+          <View style={StyleSheet.compose(styles.button, {})}>
             <Text style={styles.buttonText}>
               {screenIndex < 2 ? 'Next' : 'Confirm'}
             </Text>
           </View>
-        </TouchableOpacity>
+        </TouchableNativeFeedback>
         <Spacer height={5} />
       </SafeAreaView>
     </View>
