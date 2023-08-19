@@ -26,10 +26,6 @@ const PriceSegment = () => {
         <Text style={localStyles.value}>{String(totalPrice)} VND</Text>
       </View>
       <Spacer height={10} />
-      <View style={priceRow}>
-        <Text style={localStyles.label}>Shipment Fees</Text>
-        <Text style={localStyles.value}>15000 VND </Text>
-      </View>
       <Spacer height={10} />
       <View style={priceRow}>
         <Text style={localStyles.label}>Product Discount</Text>
@@ -47,7 +43,7 @@ const PriceSegment = () => {
           Total
         </Text>
         <Text style={localStyles.value}>
-          {String(totalPrice * (1 - discount) + 15000)} VND
+          {String(totalPrice * (1 - discount))} VND
         </Text>
       </View>
     </View>
@@ -103,8 +99,6 @@ const ProdSegment = ({orderLine}) => {
 };
 
 const CartScreen = ({navigation}) => {
-
-  
   useEffect(() => {
     const headerLeft = () => (
       <Ionicons

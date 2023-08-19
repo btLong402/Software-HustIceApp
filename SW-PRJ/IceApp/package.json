@@ -45,6 +45,7 @@
     "react-native-vector-icons": "^9.2.0",
     "react-redux": "^8.1.1",
     "redux": "^4.2.1",
+    "twilio": "^4.15.0",
     "yup": "^1.2.0"
   },
   "devDependencies": {

@@ -97,7 +97,7 @@ function AppNavigation(): JSX.Element {
           let category: any = [];
           let size: any = [];
           product.toppingList.forEach((topping: any) => {
-            toppingList.push({toppingId: String(topping.toppingId)});
+            toppingList.push({toppingId: String(topping.toppingId._id)});
           });
           product.category.forEach((cate: any) => {
             category.push({
@@ -106,7 +106,7 @@ function AppNavigation(): JSX.Element {
           });
           product.sizeList.forEach((s: any) => {
             size.push({
-              sizeId: String(s.sizeId),
+              sizeId: String(s.sizeId._id),
             });
           });
           let newProduct: Product = {

@@ -396,7 +396,7 @@ const PaymentSegment = ({
 };
 
 const PriceSegment = () => {
-  const {totalPrice, discount} = useAppSelector(state => state.orderCreate);
+  const {totalPrice, discount, shippingInfo} = useAppSelector(state => state.orderCreate);
   return (
     <View style={priceContainer}>
       <View style={priceRow}>
@@ -406,7 +406,11 @@ const PriceSegment = () => {
       <Spacer height={10} />
       <View style={priceRow}>
         <Text style={localStyles.label}>Shipment Fees</Text>
-        <Text style={localStyles.value}>15000 VND </Text>
+        <Text style={localStyles.value}>
+          {shippingInfo.shippingInstruction === 'Delivery'
+            ? '15000 VND'
+            : '0 VND'}
+        </Text>
       </View>
       <Spacer height={10} />
       <View style={priceRow}>
@@ -425,7 +429,7 @@ const PriceSegment = () => {
           Total
         </Text>
         <Text style={localStyles.value}>
-          {String(totalPrice * (1 - discount) + 15000)} VND
+          {shippingInfo.shippingInstruction === 'Delivery' ? String(totalPrice * (1 - discount) + 15000) : String(totalPrice * (1- discount))} VND
         </Text>
       </View>
     </View>

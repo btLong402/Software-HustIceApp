@@ -128,7 +128,7 @@ const ResetPassword = ({navigation}: any) => {
               </View>
               <TouchableOpacity
                 style={StyleSheet.compose(styles.sign_up_btn, {
-                  backgroundColor: isDisabled === true ? 'gray' : '#FC4F00',
+                  backgroundColor: isDisabled ? 'gray' : '#FC4F00',
                 })}
                 onPress={handleSubmit}
                 disabled={isDisabled}>

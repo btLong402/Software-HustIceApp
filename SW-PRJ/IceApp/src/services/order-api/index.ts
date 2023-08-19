@@ -23,11 +23,16 @@ export const createOrder = async ({order, cusId}) => {
       subtotal: i.subtotal,
     });
   }
+  const total =
+    order.shippingInfo.shippingInstruction === 'Delivery'
+      ? order.totalPrice * (1 - order.discount) + 15000
+      : order.totalPrice * (1 - order.discount);
   const newOrder: any = {
     customerId: cusId,
     orderLine: orderLine,
     shippingAddress: order.shippingInfo.address,
-    total: order.totalPrice * (1 - order.discount) + 15000,
+    shippingMethod: order.shippingInfo.shippingInstruction,
+    total: total,
   };
   console.log('🚀 ~ file: index.ts:28 ~ createOrder ~ newOrder:', newOrder);
   await client
